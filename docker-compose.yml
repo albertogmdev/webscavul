@@ -9,7 +9,7 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ./:/webscavul/app
+      - ./:/webscavul
   mariadb:
     image: mariadb
     container_name: webscavul_mariadb
