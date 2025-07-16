@@ -1,11 +1,8 @@
+import re
 import requests
 from requests.exceptions import RequestException
 
 def is_domain_valid(domain: str) -> bool:
-    """
-    Check if a domain given is valid, return a 200 code, or not.
-    """
-    
     try:
         if not domain:
             print("ERROR: URL del dominio obligatoria")
@@ -22,3 +19,14 @@ def is_domain_valid(domain: str) -> bool:
     except RequestException:
         print(f"ERROR: El dominio {domain} no resuelve o no es accesible")
         return {"result": False, "error": "El dominio no resuelve o no es accesible"}
+    
+def is_valid_domain(domain: str) -> bool:
+    regex = re.compile(
+        r'^(?:https?://)?'                     
+        r'(?:localhost(?:\:\d+)?'              
+        r'|(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,})' 
+        r'(?:\:\d+)?'                  
+        r'(?:/.*)?$' , re.IGNORECASE
+    )
+
+    return domain is not None and regex.search(domain)

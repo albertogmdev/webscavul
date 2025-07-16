@@ -1,39 +1,33 @@
 import requests
 from requests.exceptions import RequestException
 
-def analyze_headers(url: str) -> dict: 
-    try:
-        response = requests.get(url)
-        headers = response.headers
-        
-        hsts_info = check_hsts(headers)
-        xframe_info = check_xframe(headers)
-        content_info = check_content(headers)
-        cookie_info = check_cookie(headers)
-        csp_info = check_csp(headers)
-        
-        # Recomendables
-        xss_info = check_xss(headers)
-        referer_info = check_referer(headers)
-        permission_info = check_permissions(headers)
-        cache_info = check_cache(headers)
-        
-        result = {
-            "hsts": hsts_info,
-            "csp": csp_info,
-            "xframe": xframe_info,
-            "content_type": content_info,
-            "cookie": cookie_info,
-            "cache": cache_info,
-            "xss": xss_info,
-            "referer": referer_info,
-            "permissions": permission_info,
-            "test": headers
-        }
-        
-        return result
-    except RequestException as e:
-        return {"error": str(e)}
+def analyze_headers(headers: dict) -> dict: 
+    hsts_info = check_hsts(headers)
+    xframe_info = check_xframe(headers)
+    content_info = check_content(headers)
+    cookie_info = check_cookie(headers)
+    csp_info = check_csp(headers)
+    
+    # Recomendables
+    xss_info = check_xss(headers)
+    referer_info = check_referer(headers)
+    permission_info = check_permissions(headers)
+    cache_info = check_cache(headers)
+    
+    result = {
+        "hsts": hsts_info,
+        "csp": csp_info,
+        "xframe": xframe_info,
+        "content_type": content_info,
+        "cookie": cookie_info,
+        "cache": cache_info,
+        "xss": xss_info,
+        "referer": referer_info,
+        "permissions": permission_info,
+        "test": headers
+    }
+    
+    return result
 
 def check_hsts(headers: dict) -> dict:
     hsts = headers.get("strict-transport-security")
@@ -42,7 +36,7 @@ def check_hsts(headers: dict) -> dict:
         hsts_value = hsts.split("; ")
         return { "enabled": True, "correct": True, "value": hsts_value }
     else:
-        return{ "enabled": False }
+        return { "enabled": False }
     
 def check_content(headers: dict) -> dict:
     content = headers.get("x-content-type-options")

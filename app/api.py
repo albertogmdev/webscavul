@@ -6,11 +6,25 @@ import app.modules.ssl as ssl
 import app.modules.tls as tls
 import app.modules.information as information
 
+from app.core.session import Session
+
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.get("/test")
+def test(domain: str):
+    result = None
+    session = Session()
+
+    if session.set_domain(domain):
+        if session.make_request():
+            print(session.__dict__)
+            result = session.response.headers
+        else:
+            raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
+    else:
+        raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
+
+    return result
 
 @app.get("/custom-headers")
 def custom_headers():
@@ -30,28 +44,23 @@ def custom_headers():
 
 @app.get("/analyze")
 def analyze(domain: str):
+    session = Session()
     result = {}
-    
-    is_valid = utils.is_domain_valid(domain)
-    if not is_valid["result"]:
-        error = is_valid["error"] if hasattr(is_valid, "error") else is_valid["status_code"]
-        raise HTTPException(status_code=400, detail=error)
-    
-    domain = is_valid["domain"]
-    
-    result['information'] = information.get_IP(domain)
-    result['headers'] = headers.analyze_headers(domain)
+
+    if session.set_domain(domain):
+        if session.make_request():
+            result['information'] = information.get_IP(session.full_domain)
+            result['headers'] = headers.analyze_headers(session.response.headers)
+        else:
+            raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
+    else:
+        raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
     
     return result
 
 @app.get("/analyze/ssl")
 def analyze_ssl(domain: str):
     result = {}
-    
-    is_valid = utils.is_domain_valid(domain)
-    if not is_valid["result"]:
-        error = is_valid["error"] if hasattr(is_valid, "error") else is_valid["status_code"]
-        raise HTTPException(status_code=400, detail=error)
     
     domain = is_valid["domain"]
 
