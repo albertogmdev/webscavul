@@ -30,3 +30,11 @@ def is_valid_domain(domain: str) -> bool:
     )
 
     return domain is not None and regex.search(domain)
+
+def get_port(domain: str) -> int:
+    port = re.search(r':(\d+)', domain)
+    print(print)
+    if port:    
+        return int(port.group(1))
+    else:
+        return None

@@ -1,3 +1,4 @@
 uvicorn[standard]
 fastapi[standard]>=0.113.0
 requests
+pyopenssl

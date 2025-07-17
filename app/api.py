@@ -49,8 +49,9 @@ def analyze(domain: str):
 
     if session.set_domain(domain):
         if session.make_request():
-            result['information'] = information.get_IP(session.full_domain)
+            result['information'] = information.get_IP(session.full_domain, session.port)
             result['headers'] = headers.analyze_headers(session.response.headers)
+            result['ssl'] = ssl.analyze_ssl(session.domain, session.schema)
         else:
             raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
     else:

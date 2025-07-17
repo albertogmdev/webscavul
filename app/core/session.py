@@ -8,6 +8,7 @@ class Session:
         self.domain = None
         self.full_domain = None
         self.schema = None
+        self.port = None
         self.response = None
         self.status = None
         self.error = None
@@ -25,16 +26,18 @@ class Session:
             self.domain = domain
         else:
             self.domain = domain.replace("http://", "").replace("https://", "")
+        
+        self.port = utils.get_port(self.domain)
 
         print(f"INFO: Dominio establecido a {self.domain}")
         return True
 
     def make_request(self):
         error = None
-        schemas = ["https://", "http://"]
+        schemas = ["https", "http"]
 
         for schema in schemas:
-            full_domain = f"{schema}{self.domain}"
+            full_domain = f"{schema}://{self.domain}"
             try:
                 response = requests.get(full_domain)
                 status = response.status_code
@@ -44,6 +47,7 @@ class Session:
                     self.status = status
                     self.full_domain = full_domain
                     self.response = response
+
                     print(f"INFO: Dominio {full_domain} accedido - status: {status}")
                     break
                 else:
