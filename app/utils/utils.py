@@ -38,3 +38,9 @@ def get_port(domain: str) -> int:
         return int(port.group(1))
     else:
         return None
+    
+def remove_path(domain: str) -> str:
+    if '/' in domain:
+        return domain.split('/')[0]
+    else:
+        return domain

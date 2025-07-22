@@ -2,11 +2,13 @@ import socket
 import ssl
 from datetime import datetime
 import OpenSSL
+import app.utils.utils as utils
 
 def analyze_ssl(domain: str, schema: str) -> dict:
     if schema == "http":
         return {"error": "not_supported", "message": "SSL/TLS no es compatible con HTTP"}
 
+    domain = utils.remove_path(domain)
     context = ssl.create_default_context()
     certificate = get_certificate(context, domain)
     tls = get_tls_info(context, domain)
@@ -46,4 +48,6 @@ def get_tls_info(context, host, port=443):
             version = ssock.version()
             cipher = ssock.cipher()
     
+    if cipher: cipher = cipher[0]
+
     return { "version": version, "cipher": cipher }

@@ -5,7 +5,9 @@ import app.modules.headers as headers
 import app.modules.ssl as ssl
 import app.modules.tls as tls
 import app.modules.information as information
+import app.modules.webparser as webparser
 
+from app.core.webpage import WebPage
 from app.core.session import Session
 
 app = FastAPI()
@@ -43,15 +45,20 @@ def custom_headers():
     return Response(content=content, media_type="text/html", headers=headers)
 
 @app.get("/analyze")
-def analyze(domain: str):
+async def analyze(domain: str):
     session = Session()
     result = {}
 
     if session.set_domain(domain):
         if session.make_request():
+
             result['information'] = information.get_IP(session.full_domain, session.port)
             result['headers'] = headers.analyze_headers(session.response.headers)
             result['ssl'] = ssl.analyze_ssl(session.domain, session.schema)
+
+            webpage = WebPage()
+            await webpage.load_webpage(session.full_domain)
+            result['web'] = webparser.parse_webpage(webpage)
         else:
             raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
     else:
