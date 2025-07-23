@@ -1,4 +1,4 @@
-from app.core.webpage import WebPage, MetaTag, Form, Field, Link, Vulnerability
+from app.core.webpage import WebPage, MetaTag, Form, Field, Link, Script
 
 from bs4 import BeautifulSoup
 
@@ -11,6 +11,7 @@ def parse_webpage(webpage: WebPage):
     parse_forms(soup, webpage)
     parse_links(soup, webpage) 
     parse_metatags(soup, webpage)
+    parse_scripts(soup, webpage)
 
 def parse_metatags(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing metas in the webpage")
@@ -32,11 +33,25 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
         if form_method:
             form_method = form_method.upper()
         form_action = form.get('action')
+        form_fields = parse_fields(form)
         
         print('FORM: ', form_id, form_action, form_method)
-        print(form)
-        webpage.add_form(Form(form_id, form_action, form_method, form))
+        webpage.add_form(Form(form_id, form_action, form_method, form_fields))
         form_index += 1
+
+def parse_fields(form: BeautifulSoup):
+    fields = []
+    for field in form.find_all(['input', 'select', 'textarea']):
+        field_name = field.get('name')
+        field_type = field.get('type', 'text')
+        field_value = field.get('value', '')
+        field_placeholder = field.get('placeholder', '')
+
+        print('FIELD: ', field_name, field_type, field_value, field_placeholder)
+        fields.append(Field(field_name, field_type, field_value, field_placeholder, field))
+    
+    return fields
+
 
 def parse_links(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing links in the webpage")
@@ -48,4 +63,17 @@ def parse_links(soup: BeautifulSoup, webpage: WebPage):
 
         print('LINK: ', link_href, link_text, link_rel, link_target)
         webpage.add_link(Link(link_href, link_text, link_rel, link_target, link))
+
+def parse_scripts(soup: BeautifulSoup, webpage: WebPage):
+    print("INFO: Parsing scripts in the webpage")
+    for script in soup.find_all('script'):
+        script_src = script.get('src')
+        script_type = script.get('type')
+        script_crossorigin = script.get('crossorigin')
+        script_integrity = script.get('integrity')
+        script_content = script.string
+        script_external = script_src and webpage.domain not in script_src and not script_src.startswith('/')
+
+        print('SCRIPT: ', script_src, script_type, script_crossorigin, script_integrity, script_external)
+        webpage.add_script(Script(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
         

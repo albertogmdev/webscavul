@@ -6,6 +6,7 @@ import app.modules.ssl as ssl
 import app.modules.tls as tls
 import app.modules.information as information
 import app.modules.webparser as webparser
+import app.modules.webanalyzer as webanalyzer
 
 from app.core.webpage import WebPage
 from app.core.session import Session
@@ -56,9 +57,10 @@ async def analyze(domain: str):
             result['headers'] = headers.analyze_headers(session.response.headers)
             result['ssl'] = ssl.analyze_ssl(session.domain, session.schema)
 
-            webpage = WebPage()
+            webpage = WebPage(session.domain)
             await webpage.load_webpage(session.full_domain)
-            result['web'] = webparser.parse_webpage(webpage)
+            webparser.parse_webpage(webpage)
+            result['syntax'] = webanalyzer.analyze_webpage(webpage)
         else:
             raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
     else:
