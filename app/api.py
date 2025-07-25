@@ -42,7 +42,20 @@ def custom_headers():
         "X-XSS-Protection": "1; mode=block",
         "Set-Cookie": "sessionid=12345; Secure; HttpOnly; SameSite=Strict"
     }
-    content = "<html><body><h1>Test Headers</h1></body></html>"
+    content = "<!DOCTYPE html><html lang='en'><head><title>Document</title></head><body>"
+    try:
+        with open('app/test/links.html', 'r', encoding='utf-8') as file:
+            content += file.read()
+        with open('app/test/script_tags.html', 'r', encoding='utf-8') as file:
+            content += file.read()
+    except FileNotFoundError:
+        print("Error: El archivo no fue encontrado en la ruta especificada.")
+        content = "<h1>Archivo no encontrado</h1>"
+    except Exception as e:
+        print(f"Ocurrió un error inesperado al leer el archivo: {e}")
+        content = f"<h1>Error inesperado: {e}</h1>"
+    content += "</body></html>"
+    print(content)
     return Response(content=content, media_type="text/html", headers=headers)
 
 @app.get("/analyze")
@@ -52,15 +65,14 @@ async def analyze(domain: str):
 
     if session.set_domain(domain):
         if session.make_request():
-
-            result['information'] = information.get_IP(session.full_domain, session.port)
-            result['headers'] = headers.analyze_headers(session.response.headers)
-            result['ssl'] = ssl.analyze_ssl(session.domain, session.schema)
-
             webpage = WebPage(session.domain)
             await webpage.load_webpage(session.full_domain)
             webparser.parse_webpage(webpage)
             result['syntax'] = webanalyzer.analyze_webpage(webpage)
+
+            result['information'] = information.get_IP(session.full_domain, session.port)
+            result['headers'] = headers.analyze_headers(session.response.headers)
+            result['ssl'] = ssl.analyze_ssl(session.domain, session.schema)
         else:
             raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
     else:
@@ -68,14 +80,15 @@ async def analyze(domain: str):
     
     return result
 
-@app.get("/analyze/ssl")
-def analyze_ssl(domain: str):
+@app.get("/analyze/syntax")
+async def analyze_syntax():
     result = {}
+
+    webpage = WebPage("localhost/custom-headers")
+    await webpage.load_webpage("http://localhost/custom-headers")
+    webparser.parse_webpage(webpage)
+    result['syntax'] = webanalyzer.analyze_webpage(webpage)
     
-    domain = is_valid["domain"]
-
-    result = ssl.analyze_ssl(domain)
-
     return result
 
 @app.get("/analyze/tls")
@@ -107,7 +120,3 @@ def analyze_headers(domain: str):
     result = headers.analyze_headers(domain)
 
     return result
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int):
-    return {"item_id": item_id}

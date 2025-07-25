@@ -1,0 +1,42 @@
+<h2>Prueba de Vulnerabilidades en Enlaces</h2>
+
+<div class="section">
+    <h3>Enlaces Inseguros (HTTP)</h3>
+    <p>Estos enlaces deberían ser detectados como vulnerabilidades de "Link externo inseguro (HTTP)".</p>
+    <ul>
+        <li><a href="http://example.com/pagina1" class="vulnerable-http">Enlace HTTP 1</a></li>
+        <li><a href="http://insecure.net/recurso" class="vulnerable-http">Enlace HTTP 2</a></li>
+        <li><a href="http://otro-sitio.org/" class="vulnerable-http">Enlace HTTP 3</a></li>
+    </ul>
+</div>
+
+<div class="section">
+    <h3>Enlaces con target="_blank" sin rel="noopener noreferrer"</h3>
+    <p>Estos enlaces deberían ser detectados por no tener los atributos 'rel' adecuados.</p>
+    <ul>
+        <li><a href="https://ejemplo.com/new-tab-1" target="_blank" class="vulnerable-blank">Blank sin rel</a></li>
+        <li><a href="https://ejemplo.com/new-tab-2" target="_blank" rel="noopener" class="vulnerable-blank">Blank con solo noopener</a></li>
+        <li><a href="https://ejemplo.com/new-tab-3" target="_blank" rel="noreferrer" class="vulnerable-blank">Blank con solo noreferrer</a></li>
+        <li><a href="https://ejemplo.com/new-tab-4" target="_blank" rel="follow" class="vulnerable-blank">Blank con rel="follow"</a></li>
+    </ul>
+</div>
+
+<div class="section">
+    <h3>Enlaces Seguros y Bien Configurados</h3>
+    <p>Estos enlaces NO deberían generar ninguna vulnerabilidad.</p>
+    <ul>
+        <li><a href="https://secure-site.com/home">Enlace HTTPS Seguro</a></li>
+        <li><a href="/internal/page">Enlace Interno</a></li>
+        <li><a href="https://safe.com/external" target="_blank" rel="noopener noreferrer">Blank con noopener noreferrer</a></li>
+        <li><a href="https://secure.com/another" target="_blank" rel="noopener noreferrer nofollow">Blank con multiples rel</a></li>
+    </ul>
+</div>
+
+<div class="section">
+    <h3>Otros Casos (sin href o href vacío)</h3>
+    <p>Estos enlaces NO deberían generar la vulnerabilidad HTTP.</p>
+    <ul>
+        <li><a name="anchor-link">Enlace sin href (ancla)</a></li>
+        <li><a href="">Enlace con href vacío</a></li>
+    </ul>
+</div>

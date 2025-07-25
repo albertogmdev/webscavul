@@ -1,0 +1,19 @@
+<h2>Prueba de Vulnerabilidades en Scripts</h2>
+
+<h3>Scripts Externos Inseguros (HTTP)</h3>
+<script src="http://example.com/js/script-inseguro.js"></script>
+<script src="http://cdn.malicioso.net/lib.js"></script>
+
+<h3>Scripts con SRI Configurado de Forma Incorrecta</h3>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js" integrity="sha384-xyz-fake-hash"></script>
+
+<h3>Scripts Seguros y Bien Configurados</h3>
+<script src="https://secure.example.com/js/safe-script.js"></script>
+<script src="/js/local-script.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7JhcaTjUqV2gT4P5t/j/Fj/d/E/R/F/S/L/M/N/P/Q/R/S/T/U/V/W/X/Y/Z" crossorigin="anonymous"></script>
+
+<h3>Otros Casos (Scripts sin `src` / Scripts Inline)</h3>
+<script>alert('Este es un script inline.');</script>
+<script></script>
