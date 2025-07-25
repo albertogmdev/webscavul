@@ -72,7 +72,6 @@ def parse_linktags(soup: BeautifulSoup, webpage: WebPage):
         link_type = link.get('type')
         link_integrity = link.get('integrity')
         link_crossorigin = link.get('crossorigin')
-        link_referrer
         link_external = link_href and webpage.domain not in link_href and not link_href.startswith('/')
 
         print('LINKTAG: ', link_href, link_rel, link_type, link_integrity, link_crossorigin, link_external)

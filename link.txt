@@ -1,6 +1,7 @@
 # ANALISIS DE CABECERAS
 
 # ANALISIS SINTACTICO DE LA WEB
+https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/script
 ## Analisis scripts
 SRI: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
 Generar el SRI -> 
