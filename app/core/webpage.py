@@ -96,14 +96,13 @@ class ScriptTag:
         self.code = code
 
 class LinkTag:
-    def __init__(self, src: str, type: str, external: bool, crossorigin: str, integrity: str, content: str, code: str):
-        self.src = src
-        self.inline = src is None or src == ""
+    def __init__(self, href: str, rel: str, type: str, external: bool, integrity: str, crossorigin: str, code: str):
+        self.href = href
+        self.rel = rel
         self.type = type
         self.external = external
-        self.crossorigin = crossorigin
         self.integrity = integrity
-        self.content = content
+        self.crossorigin = crossorigin
         self.code = code
     
 class Vulnerability:

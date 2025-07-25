@@ -4,6 +4,8 @@
 ## Analisis scripts
 SRI: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
 Generar el SRI -> 
+## Analisis de link tags
+https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/link
 ## Analisis links
 ## Analisis forms y fields
 ## Analisis metas
