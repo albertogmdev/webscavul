@@ -1,0 +1,11 @@
+# ANALISIS DE CABECERAS
+
+# ANALISIS SINTACTICO DE LA WEB
+## Analisis scripts
+SRI: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
+Generar el SRI -> 
+## Analisis links
+## Analisis forms y fields
+## Analisis metas
+
+# 

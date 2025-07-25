@@ -1,4 +1,4 @@
-from app.core.webpage import WebPage, MetaTag, Form, Field, Link, Script
+from app.core.webpage import WebPage, MetaTag, Form, Field, Link, ScriptTag, LinkTag
 
 from bs4 import BeautifulSoup
 
@@ -11,7 +11,8 @@ def parse_webpage(webpage: WebPage):
     parse_forms(soup, webpage)
     parse_links(soup, webpage) 
     parse_metatags(soup, webpage)
-    parse_scripts(soup, webpage)
+    parse_scripttags(soup, webpage)
+    parse_linktags(soup, webpage)
 
 def parse_metatags(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing metas in the webpage")
@@ -52,7 +53,6 @@ def parse_fields(form: BeautifulSoup):
     
     return fields
 
-
 def parse_links(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing links in the webpage")
     for link in soup.find_all('a'):
@@ -64,7 +64,21 @@ def parse_links(soup: BeautifulSoup, webpage: WebPage):
         print('LINK: ', link_href, link_text, link_rel, link_target)
         webpage.add_link(Link(link_href, link_text, link_rel, link_target, link))
 
-def parse_scripts(soup: BeautifulSoup, webpage: WebPage):
+def parse_linktags(soup: BeautifulSoup, webpage: WebPage):
+    print("INFO: Parsing link tags in the webpage")
+    for link in soup.find_all('link'):
+        link_href = link.get('href')
+        link_rel = link.get('rel')
+        link_type = link.get('type')
+        link_integrity = link.get('integrity')
+        link_crossorigin = link.get('crossorigin')
+        link_referrer
+        link_external = link_href and webpage.domain not in link_href and not link_href.startswith('/')
+
+        print('LINKTAG: ', link_href, link_rel, link_type, link_integrity, link_crossorigin, link_external)
+        webpage.add_link_tag(LinkTag(link_href, link_rel, link_type, link_external, link_integrity, link_crossorigin, link))
+
+def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing scripts in the webpage")
     for script in soup.find_all('script'):
         script_src = script.get('src')
@@ -75,5 +89,5 @@ def parse_scripts(soup: BeautifulSoup, webpage: WebPage):
         script_external = script_src and webpage.domain not in script_src and not script_src.startswith('/')
 
         print('SCRIPT: ', script_src, script_type, script_crossorigin, script_integrity, script_external)
-        webpage.add_script(Script(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
+        webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
         

@@ -37,9 +37,10 @@ class Session:
         schemas = ["https", "http"]
 
         for schema in schemas:
+            print(f"INFO: Intentando acceder a {schema}://{self.domain}")
             full_domain = f"{schema}://{self.domain}"
             try:
-                response = requests.get(full_domain)
+                response = requests.get(full_domain, timeout=10)
                 status = response.status_code
 
                 if status == 200:

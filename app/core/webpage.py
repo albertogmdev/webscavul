@@ -6,7 +6,7 @@ class WebPage:
         self.forms = []       
         self.links = []       
         self.meta_tags = []
-        self.scripts = []
+        self.script_tags = []
         self.vulnerabilities = []
         self.content = None
 
@@ -19,8 +19,8 @@ class WebPage:
     def add_meta_tag(self, meta):
         self.meta_tags = meta
 
-    def add_script(self, script):
-        self.scripts.append(script)
+    def add_script_tag(self, script):
+        self.script_tags.append(script)
 
     def add_vulnerability(self, vulnerability):
         self.vulnerabilities.append(vulnerability)
@@ -84,7 +84,7 @@ class Link:
     def is_external(self, href: str) -> bool:
         return href and not href.startswith(self.href.split('/')[0])
     
-class Script:
+class ScriptTag:
     def __init__(self, src: str, type: str, external: bool, crossorigin: str, integrity: str, content: str, code: str):
         self.src = src
         self.inline = src is None or src == ""
@@ -94,7 +94,17 @@ class Script:
         self.integrity = integrity
         self.content = content
         self.code = code
-    
+
+class LinkTag:
+    def __init__(self, src: str, type: str, external: bool, crossorigin: str, integrity: str, content: str, code: str):
+        self.src = src
+        self.inline = src is None or src == ""
+        self.type = type
+        self.external = external
+        self.crossorigin = crossorigin
+        self.integrity = integrity
+        self.content = content
+        self.code = code
     
 class Vulnerability:
     def __init__(self, name: str, type: str, severity: str, location: str, details: str, payload: str = ""):
