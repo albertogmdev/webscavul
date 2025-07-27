@@ -1,12 +1,14 @@
 from playwright.async_api import async_playwright
 
 class WebPage:
-    def __init__(self, domain: str):
-        self.domain = domain
+    def __init__(self, url: str):
+        self.domain = url.split('/')[0]
+        self.url = url
         self.forms = []       
         self.links = []       
         self.meta_tags = []
         self.script_tags = []
+        self.link_tags = []
         self.vulnerabilities = []
         self.content = None
 
@@ -17,10 +19,13 @@ class WebPage:
         self.links.append(link)
 
     def add_meta_tag(self, meta):
-        self.meta_tags = meta
+        self.meta_tags.append(meta)
 
     def add_script_tag(self, script):
         self.script_tags.append(script)
+
+    def add_link_tag(self, link):
+        self.link_tags.append(link)
 
     def add_vulnerability(self, vulnerability):
         self.vulnerabilities.append(vulnerability)
@@ -47,9 +52,11 @@ class WebPage:
             await browser.close()
 
 class MetaTag:
-    def __init__(self, name: str, content: str):
+    def __init__(self, name: str, content: str, http: str, code: str):
         self.name = name
         self.content = content
+        self.http = http
+        self.code = code
 
 class Form:
     def __init__(self, id: str, action: str, method: str, fields: str):
@@ -82,7 +89,7 @@ class Link:
         return target and target == "_blank"
 
     def is_external(self, href: str) -> bool:
-        return href and not href.startswith(self.href.split('/')[0])
+        return href and href.startswith(("http://", "https://", "//"))
     
 class ScriptTag:
     def __init__(self, src: str, type: str, external: bool, crossorigin: str, integrity: str, content: str, code: str):

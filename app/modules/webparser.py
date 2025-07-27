@@ -17,11 +17,12 @@ def parse_webpage(webpage: WebPage):
 def parse_metatags(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing metas in the webpage")
     for meta in soup.find_all('meta'):
-        meta_name = meta.get('name', '').lower()
-        meta_content = meta.get('content', '')
+        meta_name = meta.get('name')
+        meta_content = meta.get('content')
+        meta_http = meta.get('http-equiv')
         if meta_name and meta_content:
-            print('META: ', meta_name, meta_content)
-            webpage.add_meta_tag(MetaTag(meta_name, meta_content))
+            print('META: ', meta_name, meta_content, meta_http)
+            webpage.add_meta_tag(MetaTag(meta_name, meta_content, meta_http, meta))
 
 def parse_forms(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing forms in the webpage")

@@ -48,6 +48,8 @@ def custom_headers():
             content += file.read()
         with open('app/test/script_tags.html', 'r', encoding='utf-8') as file:
             content += file.read()
+        with open('app/test/link_tags.html', 'r', encoding='utf-8') as file:
+            content += file.read()
     except FileNotFoundError:
         print("Error: El archivo no fue encontrado en la ruta especificada.")
         content = "<h1>Archivo no encontrado</h1>"

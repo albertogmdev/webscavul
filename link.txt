@@ -1,4 +1,6 @@
 # ANALISIS DE CABECERAS
+## Referer
+https://web.dev/articles/referrer-best-practices?hl=es
 
 # ANALISIS SINTACTICO DE LA WEB
 https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/script
@@ -11,4 +13,6 @@ https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/link
 ## Analisis forms y fields
 ## Analisis metas
 
-# 
+# OTROS
+## Token CSRF
+https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#token-based-mitigation

@@ -57,6 +57,7 @@ def analyze_script_tags(webpage: WebPage):
 def analyze_link_tags(webpage: WebPage):
     print("INFO: Analyzing link tags in the webpage")
 
+    deprecated_attributes = ['charset', 'rev']
     for link in webpage.link_tags:
         # Link externo inseguro
         if link.href and link.href != '' and link.href.startswith('http://'):
@@ -65,7 +66,7 @@ def analyze_link_tags(webpage: WebPage):
                     name="Link externo inseguro (HTTP)",
                     type="Link",
                     severity="Low",
-                    location=link.href,
+                    location=f"{link.code}",
                     details="Link tag apunta a un recurso externo utilizando HTTP en lugar de HTTPS.",
                 )
             )
@@ -81,13 +82,31 @@ def analyze_link_tags(webpage: WebPage):
                         name=f"Link {sri_value}",
                         type="Link",
                         severity="Medium",
-                        location=link.href,
+                        location=f"{link.code}",
                         details="Link tag no tiene los atributos 'crossorigin' e 'integrity', lo que puede permitir ataques de inyección.",
+                    )
+                )
+        # Link con atributes deprecated
+        attributes = []
+        for attribute in deprecated_attributes:
+            if f"{attribute}=" in link.code: attributes.append(attribute)
+        if len(attributes) > 0: 
+            separator = ','
+            webpage.add_vulnerability(
+                    Vulnerability(
+                        name=f"Link con atributos {separator.join(attributes)} deprecados",
+                        type="Link",
+                        severity="Medium",
+                        location=f"{link.code}",
+                        details=f"Link tag contiene los atributos deprecated {separator.join(attributes)}.",
                     )
                 )
 
 def analyze_metatags(webpage: WebPage):
     print("INFO: Analyzing metatags in the webpage")
+
+    for meta in webpage.meta_tags:
+        print(meta.name, meta.content, meta.http)
 
 def analyze_links(webpage: WebPage):
     print("INFO: Analyzing links in the webpage")
@@ -100,13 +119,13 @@ def analyze_links(webpage: WebPage):
                     name="Enlace externo inseguro (HTTP)",
                     type="Enlace",
                     severity="Low",
-                    location=link.text,
+                    location=link.href,
                     details="El enlace apunta a un recurso externo utilizando HTTP en lugar de HTTPS.",
                 )
             )
         # Link con target _blank sin rel="noopener noreferrer"
         rel_value = ""
-        if link.blank:
+        if link.blank and link.href is not None and link.href != "" and link.external:
             if link.rel is None or link.rel is not None and "noopener" not in link.rel and "noreferrer" not in link.rel: rel_value = "rel=noopener noreferrer"
             elif "noopener" not in link.rel: rel_value = "rel=noopener"
             elif "noreferrer" not in link.rel: rel_value = "rel=noreferrer"
@@ -117,7 +136,7 @@ def analyze_links(webpage: WebPage):
                         name=f"Enlace con target _blank sin {rel_value}",
                         type="Enlace",
                         severity="Medium",
-                        location=link.text,
+                        location=link.href,
                         details="El enlace tiene un target '_blank' sin el atributo 'rel' adecuado, lo que puede permitir ataques de phishing.",
                     )
                 )
