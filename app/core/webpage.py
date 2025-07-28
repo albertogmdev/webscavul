@@ -19,7 +19,7 @@ class WebPage:
         self.links.append(link)
 
     def add_meta_tag(self, meta):
-        self.meta_tags.append(meta)
+        self.meta_tags.append(meta)\
 
     def add_script_tag(self, script):
         self.script_tags.append(script)
@@ -29,6 +29,24 @@ class WebPage:
 
     def add_vulnerability(self, vulnerability):
         self.vulnerabilities.append(vulnerability)
+
+    def get_meta_by_name(self, name: str):
+        for meta in self.meta_tags:
+            if meta.name and meta.name.lower() == name.lower():
+                return meta
+        return None
+
+    def get_meta_by_http(self, http: str):
+        for meta in self.meta_tags:
+            if meta.http and meta.http.lower() == http.lower():
+                return meta
+        return None
+
+    def get_meta_charset(self):
+        for meta in self.meta_tags:
+            if meta.charset:
+                return meta
+        return None
 
     async def load_webpage(self, url: str):
         async with async_playwright() as p:
@@ -52,10 +70,11 @@ class WebPage:
             await browser.close()
 
 class MetaTag:
-    def __init__(self, name: str, content: str, http: str, code: str):
+    def __init__(self, name: str, content: str, http: str, charset: str, code: str):
         self.name = name
         self.content = content
         self.http = http
+        self.charset = charset
         self.code = code
 
 class Form:

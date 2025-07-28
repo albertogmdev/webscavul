@@ -20,9 +20,10 @@ def parse_metatags(soup: BeautifulSoup, webpage: WebPage):
         meta_name = meta.get('name')
         meta_content = meta.get('content')
         meta_http = meta.get('http-equiv')
-        if meta_name and meta_content:
-            print('META: ', meta_name, meta_content, meta_http)
-            webpage.add_meta_tag(MetaTag(meta_name, meta_content, meta_http, meta))
+        meta_charset = meta.get('charset')
+        if meta_name and meta_content or meta_http or meta_charset:
+            print('[META]', meta_name, meta_content, meta_http, meta_charset)
+            webpage.add_meta_tag(MetaTag(meta_name, meta_content, meta_http, meta_charset, meta))
 
 def parse_forms(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing forms in the webpage")
@@ -37,7 +38,7 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
         form_action = form.get('action')
         form_fields = parse_fields(form)
         
-        print('FORM: ', form_id, form_action, form_method)
+        print('[FORM]', form_id, form_action, form_method)
         webpage.add_form(Form(form_id, form_action, form_method, form_fields))
         form_index += 1
 
@@ -49,7 +50,7 @@ def parse_fields(form: BeautifulSoup):
         field_value = field.get('value', '')
         field_placeholder = field.get('placeholder', '')
 
-        print('FIELD: ', field_name, field_type, field_value, field_placeholder)
+        print('[FIELD]', field_name, field_type, field_value, field_placeholder)
         fields.append(Field(field_name, field_type, field_value, field_placeholder, field))
     
     return fields
@@ -62,7 +63,7 @@ def parse_links(soup: BeautifulSoup, webpage: WebPage):
         link_target = link.get('target')
         link_rel = link.get('rel')
 
-        print('LINK: ', link_href, link_text, link_rel, link_target)
+        print('[LINK]', link_href, link_text, link_rel, link_target)
         webpage.add_link(Link(link_href, link_text, link_rel, link_target, link))
 
 def parse_linktags(soup: BeautifulSoup, webpage: WebPage):
@@ -75,7 +76,7 @@ def parse_linktags(soup: BeautifulSoup, webpage: WebPage):
         link_crossorigin = link.get('crossorigin')
         link_external = link_href and webpage.domain not in link_href and not link_href.startswith('/')
 
-        print('LINKTAG: ', link_href, link_rel, link_type, link_integrity, link_crossorigin, link_external)
+        print('[LINKTAG]', link_href, link_rel, link_type, link_integrity, link_crossorigin, link_external)
         webpage.add_link_tag(LinkTag(link_href, link_rel, link_type, link_external, link_integrity, link_crossorigin, link))
 
 def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
@@ -88,6 +89,6 @@ def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
         script_content = script.string
         script_external = script_src and webpage.domain not in script_src and not script_src.startswith('/')
 
-        print('SCRIPT: ', script_src, script_type, script_crossorigin, script_integrity, script_external)
+        print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
         webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
         

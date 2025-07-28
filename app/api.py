@@ -50,6 +50,8 @@ def custom_headers():
             content += file.read()
         with open('app/test/link_tags.html', 'r', encoding='utf-8') as file:
             content += file.read()
+        with open('app/test/metas.html', 'r', encoding='utf-8') as file:
+            content += file.read()
     except FileNotFoundError:
         print("Error: El archivo no fue encontrado en la ruta especificada.")
         content = "<h1>Archivo no encontrado</h1>"
@@ -67,14 +69,20 @@ async def analyze(domain: str):
 
     if session.set_domain(domain):
         if session.make_request():
+            result_information = information.get_IP(session.full_domain, session.port)
+            result_headers = headers.analyze_headers(session.response.headers)
+            result_ssl = ssl.analyze_ssl(session.domain, session.schema)
             webpage = WebPage(session.domain)
             await webpage.load_webpage(session.full_domain)
             webparser.parse_webpage(webpage)
-            result['syntax'] = webanalyzer.analyze_webpage(webpage)
+            result_syntax = webanalyzer.analyze_webpage(webpage, result_headers)
 
-            result['information'] = information.get_IP(session.full_domain, session.port)
-            result['headers'] = headers.analyze_headers(session.response.headers)
-            result['ssl'] = ssl.analyze_ssl(session.domain, session.schema)
+            result = {
+                "information": result_information,
+                "headers": result_headers,
+                "ssl": result_ssl,
+                "syntax": result_syntax
+            }
         else:
             raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
     else:
@@ -85,11 +93,12 @@ async def analyze(domain: str):
 @app.get("/analyze/syntax")
 async def analyze_syntax():
     result = {}
+    headers = {"hsts":{"enabled":False},"csp":{"enabled":False},"xframe":{"enabled":False},"content_type":{"enabled":False,"correct":False},"cookie":{"enabled":False},"cache":{"enabled":False,"correct":False},"xss":{"enabled":False,"correct":False},"referrer":{"enabled":False,"correct":False},"permissions":{"enabled":False,"correct":False},"refresh":{"enabled":False}}
 
     webpage = WebPage("localhost/custom-headers")
     await webpage.load_webpage("http://localhost/custom-headers")
     webparser.parse_webpage(webpage)
-    result['syntax'] = webanalyzer.analyze_webpage(webpage)
+    result['syntax'] = webanalyzer.analyze_webpage(webpage, headers)
     
     return result
 

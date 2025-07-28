@@ -1,5 +1,4 @@
-import requests
-from requests.exceptions import RequestException
+import re
 
 def analyze_headers(headers: dict) -> dict: 
     hsts_info = check_hsts(headers)
@@ -10,7 +9,8 @@ def analyze_headers(headers: dict) -> dict:
     
     # Recomendables
     xss_info = check_xss(headers)
-    referer_info = check_referer(headers)
+    refesh_info = check_refesh(headers)
+    referrer_info = check_referrer(headers)
     permission_info = check_permissions(headers)
     cache_info = check_cache(headers)
     
@@ -22,9 +22,9 @@ def analyze_headers(headers: dict) -> dict:
         "cookie": cookie_info,
         "cache": cache_info,
         "xss": xss_info,
-        "referer": referer_info,
+        "referrer": referrer_info,
         "permissions": permission_info,
-        "test": headers
+        "refresh": refesh_info
     }
     
     return result
@@ -33,7 +33,7 @@ def check_hsts(headers: dict) -> dict:
     hsts = headers.get("strict-transport-security")
     
     if hsts:
-        hsts_value = hsts.split("; ")
+        hsts_value = re.split('; |, ', hsts.lower())
         return { "enabled": True, "correct": True, "value": hsts_value }
     else:
         return { "enabled": False }
@@ -55,7 +55,7 @@ def check_xss(headers: dict) -> dict:
     
     if xss:
         isCorrect = False
-        xss_value = xss.lower().split("; ")
+        xss_value = re.split('; |, ', xss.lower())
         
         if "1" in xss_value and "mode=block" in xss_value:
             isCorrect = True
@@ -76,28 +76,36 @@ def check_xframe(headers: dict) -> dict:
         return {"enabled": True, "correct": isCorrect, "value": xframe}
     else:
         return {"enabled": False}
+    
+def check_refesh(headers: dict) -> dict:
+    refresh = headers.get("refresh")
+    
+    if refresh:
+        return {"enabled": True, "value": refresh}
+    else:
+        return {"enabled": False}   
 
 def check_permissions(headers: dict) -> dict:
     permission = headers.get("permissions-policy")
     
     if permission:
-        permission_value = permission.lower().split(", ")
+        permission_value = re.split('; |, ', permission.lower())
 
         return {"enabled": True, "correct": True, "value": permission_value}
     else:
         return {"enabled": False, "correct": False}
 
-def check_referer(headers: dict) -> dict:
-    referer = headers.get("referrer-policy")
+def check_referrer(headers: dict) -> dict:
+    referrer = headers.get("referrer-policy")
     
-    if referer:
+    if referrer:
         isCorrect = False
-        referer_value = referer.lower().split(", ")
+        referrer_value = re.split('; |, ', referrer.lower())
         
-        if "no-referrer" in referer_value or "strict-origin-when-cross-origin" in referer_value:
+        if referrer_value not in ['no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade', 'strict-origin']:
             isCorrect = True
             
-        return {"enabled": True, "correct": isCorrect, "value": referer_value}
+        return {"enabled": True, "correct": isCorrect, "value": referrer_value}
     else:
         return {"enabled": False, "correct": False}
 
@@ -106,7 +114,7 @@ def check_cache(headers: dict) -> dict:
     
     if cache:
         isCorrect = False
-        cache_value = cache.lower().split(", ")
+        cache_value = re.split('; |, ', cache.lower())
         
         if "no-store" in cache_value:
             isCorrect = True
@@ -119,7 +127,7 @@ def check_cookie(headers: dict) -> dict:
     cookie = headers.get("set-cookie")
     
     if cookie:
-        cookie_value = cookie.lower().split("; ")
+        cookie_value = re.split('; |, ', cookie.lower())
         isCorrect = False
         
         if "secure" in cookie_value and "httponly" in cookie_value:
@@ -133,7 +141,7 @@ def check_csp(headers: dict) -> dict:
     csp = headers.get("content-security-policy")
     
     if csp:
-        csp_value = csp.split("; ")
+        csp_value = re.split('; |, ', csp.lower())
         return {"enabled": True, "correct": True, "value": csp_value}
     else:
         return {"enabled": False}
