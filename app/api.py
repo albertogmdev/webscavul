@@ -42,7 +42,9 @@ def custom_headers():
         "X-XSS-Protection": "1; mode=block",
         "Set-Cookie": "sessionid=12345; Secure; HttpOnly; SameSite=Strict"
     }
+
     content = "<!DOCTYPE html><html lang='en'><head><title>Document</title></head><body>"
+    
     try:
         with open('app/test/links.html', 'r', encoding='utf-8') as file:
             content += file.read()
@@ -59,7 +61,7 @@ def custom_headers():
         print(f"Ocurrió un error inesperado al leer el archivo: {e}")
         content = f"<h1>Error inesperado: {e}</h1>"
     content += "</body></html>"
-    print(content)
+    
     return Response(content=content, media_type="text/html", headers=headers)
 
 @app.get("/analyze")

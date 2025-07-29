@@ -1,5 +1,4 @@
 from app.core.webpage import WebPage, MetaTag, Form, Field, Link, Vulnerability
-from bs4 import BeautifulSoup
 import re
 
 def analyze_webpage(webpage: WebPage, headers: dict) -> dict:
@@ -21,6 +20,57 @@ def analyze_webpage(webpage: WebPage, headers: dict) -> dict:
 
 def analyze_forms(webpage: WebPage):
     print("INFO: Analyzing forms in the webpage")
+    
+    for form in webpage.forms:
+        # CSRF Token not present
+        if not form.has_csrf and not form.has_captcha:
+            # TODO - Mirar el tipo de form y poner la severity segun eso
+            severity = 'Recomendation'
+            webpage.add_vulnerability(
+                Vulnerability(
+                    name=f"Formulario sin token CSRF implementado",
+                    type="Form",
+                    severity=severity,
+                    location=form.id,
+                    details="",
+                )
+            )
+        
+        # Action with HTTP url
+        if form.action and form.action.startswith('http://'):
+            webpage.add_vulnerability(
+                Vulnerability(
+                    name="Form con atributo 'action' externo inseguro (HTTP)",
+                    type="Form",
+                    severity="High",
+                    location=form.action,
+                    details="",
+                )
+            )
+
+        # Form with sensitive data without proper method 
+        if (not form.method or form.method.lower() == 'get' or form.method == '') and 'password' in form.fields_count:
+            webpage.add_vulnerability(
+                Vulnerability(
+                    name="Form con datos confidenciales expuestos (GET)",
+                    type="Form",
+                    severity="High",
+                    location=form.method,
+                    details="",
+                )
+            )
+        
+        # Form without action atribute
+        if not form.action or form.action == '':
+            webpage.add_vulnerability(
+                Vulnerability(
+                    name="Form con atributo 'action' vacío",
+                    type="Form",
+                    severity="Recommendation",
+                    location=form.id,
+                    details="Se recomienda especificar explícitamente el valor del atributo 'action' para mejorar la claridad del código, la mantenibilidad y evitar posibles confusiones. El formulario enviará los datos a la misma URL de la página."
+                )
+            )
 
 def analyze_script_tags(webpage: WebPage):
     print("INFO: Analyzing script tags in the webpage")

@@ -78,17 +78,33 @@ class MetaTag:
         self.code = code
 
 class Form:
-    def __init__(self, id: str, action: str, method: str, fields: str):
+    def __init__(self, id: str, action: str, method: str, type: str):
         self.id = id
         self.action = action
         self.method = method
-        self.fields = fields
+        self.fields = []
+        self.form_type = type
+        self.fields_count = {}
+        self.has_csrf = False
+        self.has_captcha = False
 
     def add_field(self, field):
+        # Count fields types in a form
+        if field.type != 'hidden':
+            if field.type not in self.fields_count: self.fields_count[field.type] = 1
+            else: self.fields_count[field.type] = self.fields_count[field.type] + 1
+        # Check if input is related to captcha or csrf
+        if field.id and 'csrf' in field.id or field.classname and 'csrf' in ''.join(field.classname).lower() or field.name and 'csrf' in field.name.lower():
+            self.has_csrf = True
+        if field.id and 'captcha' in field.id or field.classname and 'captcha' in ''.join(field.classname).lower() or field.name and 'captcha' in field.name.lower():
+            self.has_captcha = True
+
         self.fields.append(field)
 
 class Field:
-    def __init__(self, name: str, type: str, value: str, placeholder: str, code: str):
+    def __init__(self, id: str, classname: str, name: str, type: str, value: str, placeholder: str, code: str):
+        self.id = id
+        self.classname = classname
         self.name = name
         self.type = type
         self.value = value

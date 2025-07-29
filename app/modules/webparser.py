@@ -1,5 +1,4 @@
 from app.core.webpage import WebPage, MetaTag, Form, Field, Link, ScriptTag, LinkTag
-
 from bs4 import BeautifulSoup
 
 def parse_webpage(webpage: WebPage):
@@ -36,24 +35,27 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
         if form_method:
             form_method = form_method.upper()
         form_action = form.get('action')
-        form_fields = parse_fields(form)
+        form_type = determine_formtype(form, form_id, form_method, form_action)
         
-        print('[FORM]', form_id, form_action, form_method)
-        webpage.add_form(Form(form_id, form_action, form_method, form_fields))
+        print('[FORM]', form_id, form_action, form_method, form_type)
+        formObject = Form(form_id, form_action, form_method, form_type)
+        parse_fields(form, formObject)
+        webpage.add_form(formObject)
+
         form_index += 1
 
-def parse_fields(form: BeautifulSoup):
-    fields = []
+def parse_fields(form: BeautifulSoup, formObject: Form):
     for field in form.find_all(['input', 'select', 'textarea']):
+        field_id = field.get('id')
+        field_class = field.get('class')
         field_name = field.get('name')
         field_type = field.get('type', 'text')
+        if field.name == 'select' or field.name == 'textarea': field_type = field.name
         field_value = field.get('value', '')
         field_placeholder = field.get('placeholder', '')
 
-        print('[FIELD]', field_name, field_type, field_value, field_placeholder)
-        fields.append(Field(field_name, field_type, field_value, field_placeholder, field))
-    
-    return fields
+        print('[FIELD]', field_id, field_class, field_name, field_type, field_value, field_placeholder)
+        formObject.add_field(Field(field_id, field_class, field_name, field_type, field_value, field_placeholder, field))
 
 def parse_links(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing links in the webpage")
@@ -92,3 +94,20 @@ def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
         print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
         webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
         
+def determine_formtype(form: BeautifulSoup, id: str, method: str, action: str):
+    form_type = None
+    types = {
+        "login": 0,
+        "register": 0,
+        "search": 0,
+        "contact": 0
+    }
+
+    # Checkt form id
+
+    # Check form action
+
+    # Check form fields and labels/p/divs
+
+
+    return form_type
