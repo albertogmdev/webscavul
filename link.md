@@ -14,6 +14,11 @@ Generar el SRI ->
 https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/link
 ## Analisis links
 ## Analisis forms y fields
+### Determinar form type
+https://www.sciencedirect.com/topics/computer-science/heuristic-algorithm
+### Token CSRF
+https://brightsec.com/blog/csrf-example/
+Condiciones para ver comprobar si tienen CSRF
 ## Analisis metas
 https://www.dopethemes.com/securing-meta-tags-preventing-clickjacking-xss-and-other-vulnerabilities/
 https://www.w3schools.com/tags/att_meta_http_equiv.asp
