@@ -78,13 +78,14 @@ class MetaTag:
         self.code = code
 
 class Form:
-    def __init__(self, id: str, action: str, method: str, type: str):
+    def __init__(self, id: str, classname: list[str], action: str, method: str):
         self.id = id
+        self.classname = classname
         self.action = action
         self.method = method
         self.fields = []
-        self.form_type = type
-        self.fields_count = {}
+        self.form_type = None
+        self.fields_count = {"total": 0}
         self.has_csrf = False
         self.has_captcha = False
 
@@ -93,6 +94,7 @@ class Form:
         if field.type != 'hidden':
             if field.type not in self.fields_count: self.fields_count[field.type] = 1
             else: self.fields_count[field.type] = self.fields_count[field.type] + 1
+            self.fields_count["total"] = self.fields_count["total"] + 1
         # Check if input is related to captcha or csrf
         if field.id and 'csrf' in field.id or field.classname and 'csrf' in ''.join(field.classname).lower() or field.name and 'csrf' in field.name.lower():
             self.has_csrf = True
@@ -100,6 +102,23 @@ class Form:
             self.has_captcha = True
 
         self.fields.append(field)
+
+    def set_form_type(self, type: str):
+        self.form_type = type
+    
+    def format_form_info(self) -> str:
+        form_id = ""
+        form_class = ""
+        form_action = ""
+
+        if self.id and self.id != "":
+            form_id = f"{self.id.lower().replace('-', '').replace('_', '')} "
+        if self.classname and len(self.classname) > 0:
+            form_class = f"{" ".join(self.classname).lower().replace('-', '').replace('_', '')} "
+        if self.action and self.action != "":
+            form_action = self.action.lower().replace('-', '').replace('_', '')
+
+        return f"{form_id}{form_class}{form_action}"
 
 class Field:
     def __init__(self, id: str, classname: str, name: str, type: str, value: str, placeholder: str, code: str):
@@ -110,6 +129,13 @@ class Field:
         self.value = value
         self.placeholder = placeholder
         self.code = code
+    
+    def format_field_info(self) -> str:
+        field_id = ""
+        field_class = ""
+        field_name = ""
+
+        return f"{form_id}{form_class}{form_action}"
 
 class Link:
     def __init__(self, href: str, text: str, rel: str, target: str, code: str):

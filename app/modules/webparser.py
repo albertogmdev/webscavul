@@ -1,3 +1,5 @@
+import app.utils.utils as utils
+
 from app.core.webpage import WebPage, MetaTag, Form, Field, Link, ScriptTag, LinkTag
 from bs4 import BeautifulSoup
 
@@ -29,17 +31,23 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
     form_index = 1
     for form in soup.find_all('form'):
         form_id = form.get('id')
+        form_class = form.get('class')
         if not form_id:
             form_id = f'form:nth-child({form_index})'
         form_method = form.get('method')
         if form_method:
             form_method = form_method.upper()
         form_action = form.get('action')
-        form_type = determine_formtype(form, form_id, form_method, form_action)
-        
-        print('[FORM]', form_id, form_action, form_method, form_type)
-        formObject = Form(form_id, form_action, form_method, form_type)
+
+        formObject = Form(form_id, form_class, form_action, form_method)
+
         parse_fields(form, formObject)
+        form_type = determine_formtype(formObject)
+
+        if form_type: 
+            formObject.set_form_type(form_type)
+
+        print('[FORM]', form_id, form_action, form_method)
         webpage.add_form(formObject)
 
         form_index += 1
@@ -94,20 +102,61 @@ def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
         print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
         webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
         
-def determine_formtype(form: BeautifulSoup, id: str, method: str, action: str):
+def determine_formtype(form: Form):
     form_type = None
+    keywords = {
+        "login": ["login", "signin", "auth", "access", "identify", "acceso", "acceder", "entrar", "identificacion", "identificar", "autenticar", "autenticacion", "iniciosesion", "iniciarsesion"],
+        "signup": ["register", "signup", "createaccount", "newaccount", "accountnew", "join", "registro", "registrar", "crearcuenta", "nuevacuenta", "cuentanueva", "registrarme", "alta", "unirse", "unirme"],
+        "search": ["search", "query", "find", "busqueda", "buscar", "buscador"],
+        "contact": ["contact", "message", "inquiry", "feedback",  "support", "help", "contacto", "ayuda", "soporte", "consulta"],
+
+    }
     types = {
         "login": 0,
-        "register": 0,
+        "signup": 0,
         "search": 0,
         "contact": 0
     }
 
-    # Checkt form id
+    print(form.fields_count)
+    total_count = form.fields_count["total"]
+    # Checkt form id, action and classes
+    formated_info = form.format_form_info()
+    if formated_info and formated_info != "":   
+        for type, values in keywords.items():
+            for keyword in values:
+                if keyword in formated_info: 
+                    types[type] += 10
+                    break
 
-    # Check form action
+    # Heuristic for login form
+    if total_count <= 5 and total_count >= 2: types["login"] += 2
+    else: types["login"] -= 3
+    # Heuristic for signup form
+    if total_count <= 5 and total_count >= 2: types["signup"] += 2
+    # Heuristic for search form, usually a 2 or 3 inputs, with a text/search input and maybe a submit
+    allowed_search_inputs = ["search", "text", "submit"]
+    if total_count <= 3: types["search"] += 2
+    else: types["search"] -= 3
+    for input in form.fields_count: 
+        if input == "search": types["search"] += 5
+        elif input not in allowed_search_inputs: types["search"] -= 1
+    # Heuristic for contact form
 
-    # Check form fields and labels/p/divs
 
+    max_value = -100
+    selected_type = None
+    multiple_types = False
+    for type, value in types.items():
+        if value > max_value:
+            max_value = value
+            selected_type = type
+            multiple_types = False
+        if value == max_value and value > 0:
+            multiple_types = True
+    
+    print(types)
+    print(formated_info)
+    print(selected_type)
 
     return form_type
