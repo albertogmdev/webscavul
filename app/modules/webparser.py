@@ -2,6 +2,7 @@ import app.utils.utils as utils
 
 from app.core.webpage import WebPage, MetaTag, Form, Field, Link, ScriptTag, LinkTag
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
 def parse_webpage(webpage: WebPage):
     if not webpage.content:
@@ -42,7 +43,7 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
         formObject = Form(form_id, form_class, form_action, form_method)
 
         parse_fields(form, formObject)
-        form_type = determine_formtype(formObject)
+        form_type = determine_formtype(formObject, form, webpage.url)
 
         if form_type: 
             formObject.set_form_type(form_type)
@@ -102,11 +103,11 @@ def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
         print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
         webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
         
-def determine_formtype(form: Form):
+def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
     form_type = None
     keywords = {
         "login": ["login", "signin", "auth", "access", "identify", "acceso", "acceder", "entrar", "identificacion", "identificar", "autenticar", "autenticacion", "iniciosesion", "iniciarsesion"],
-        "signup": ["register", "signup", "createaccount", "newaccount", "accountnew", "join", "registro", "registrar", "crearcuenta", "nuevacuenta", "cuentanueva", "registrarme", "alta", "unirse", "unirme"],
+        "signup": ["register", "signup", "createaccount", "newaccount", "accountnew", "join", "registro", "registrar", "crearcuenta", "crearunacuenta", "nuevacuenta", "cuentanueva", "registrarme", "alta", "unirse", "unirme"],
         "search": ["search", "query", "find", "busqueda", "buscar", "buscador"],
         "contact": ["contact", "message", "inquiry", "feedback",  "support", "help", "contacto", "ayuda", "soporte", "consulta"],
 
@@ -128,19 +129,108 @@ def determine_formtype(form: Form):
                 if keyword in formated_info: 
                     types[type] += 10
                     break
+    
+    # Check page url
+    paths = url.split("/")
+    if paths and len(paths) > 1:
+        url_path = " ".join(paths[1:]).lower().replace('-', '').replace('_', '')
+        for type, values in keywords.items():
+            for keyword in values:
+                if keyword in url_path: 
+                    types[type] += 10
+                    break
+
+    # Check submit input/button
+    submit_elements = form_element.find_all(
+        lambda tag: (tag.name == 'button' and tag.get('type') == 'submit') or (tag.name == 'input' and tag.get('type') == 'submit')
+    )
+    submit_info = []
+    for element in submit_elements:
+        info = ""
+        element_name = element.get('name')
+        element_text = element.text
+        element_value = element.get('value')
+        element_id = element.get('id')
+        element_class = element.get('class')
+
+        if element_id and element_id != "":
+            info += f"{element_id.lower().replace('-', '').replace('_', '')} "
+        if element_value and element_value != "":
+            info += f"{element_value.lower().replace('-', '').replace('_', '')} "
+        if element_text and element_text != "":
+            info += f"{element_text.lower().replace('-', '').replace('_', '')} "
+        if element_name and element_name != "":
+            info += f"{element_name.lower().replace('-', '').replace('_', '')} "
+        if element_class and len(element_class) > 0:
+            info += f"{" ".join(element_class).lower().replace('-', '').replace('_', '')} "
+
+        if info != "": submit_info.append(info)
+    
+    for type, values in keywords.items():
+        type_found = False
+        for keyword in values:
+            for info in submit_info:
+                if keyword in info: 
+                    print(f"ENCONTRADO {keyword} - {type} >>>>>>>>>> {info}")
+                    types[type] += 5
+                    type_found = True
+                    break
+            if type_found:
+                break
+    
+    # Check tag with text
+    form_texts = []
+    for element in form_element.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p']):
+        if element and element.text and element.text != "":
+            formatted_text = utils.remove_accents(element.text.lower().strip().replace(" ", ""))
+            form_texts.append(formatted_text)
+    for element in form_element.find_all('div'):
+        has_child_tags = any(isinstance(child, Tag) for child in element.children)
+        has_text = element.text.strip() != ""
+        if not has_child_tags and has_text:
+            formatted_text = utils.remove_accents(element.text.lower().strip().replace(" ", ""))
+            form_texts.append(formatted_text)
+
+    for element in form_texts:
+        for type, values in keywords.items():
+            for keyword in values:
+                if keyword in element: 
+                    types[type] += 5
+                    break
+    for type, values in keywords.items():
+        type_found = False
+        for keyword in values:
+            for text in form_texts:
+                if keyword in text: 
+                    types[type] += 5
+                    type_found = True
+                    break
+            if type_found:
+                break
 
     # Heuristic for login form
+    allowed_login_inputs = ["password", "text", "submit", "email", "checkbox", "button"]
     if total_count <= 5 and total_count >= 2: types["login"] += 2
     else: types["login"] -= 3
+    for input, count in form.fields_count.items():
+        if input == "password" and count == 1: types["login"] += 3
+        elif input == "password"and count != 1: types["login"] -= 5
+        if input not in allowed_login_inputs: types["login"] -= 1
+    
     # Heuristic for signup form
     if total_count <= 5 and total_count >= 2: types["signup"] += 2
+    for input, count in form.fields_count.items():
+        if input == "password" and count == 1: types["signup"] += 1
+        elif input == "password" and count == 2: types["signup"] += 4
+
     # Heuristic for search form, usually a 2 or 3 inputs, with a text/search input and maybe a submit
     allowed_search_inputs = ["search", "text", "submit"]
     if total_count <= 3: types["search"] += 2
     else: types["search"] -= 3
-    for input in form.fields_count: 
+    for input, count in form.fields_count.items(): 
         if input == "search": types["search"] += 5
         elif input not in allowed_search_inputs: types["search"] -= 1
+    
     # Heuristic for contact form
 
 

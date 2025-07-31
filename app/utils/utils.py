@@ -1,4 +1,5 @@
 import re
+import unicodedata
 import requests
 from requests.exceptions import RequestException
     
@@ -26,3 +27,8 @@ def remove_path(domain: str) -> str:
         return domain.split('/')[0]
     else:
         return domain
+    
+def remove_accents(text: str) -> str:
+    nfkd_form = unicodedata.normalize('NFKD', text)
+    without_accents = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    return without_accents
