@@ -4,3 +4,4 @@ requests
 pyopenssl
 playwright
 beautifulsoup4
+mariadb

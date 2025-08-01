@@ -54,6 +54,8 @@ def custom_headers():
             content += file.read()
         with open('app/test/metas.html', 'r', encoding='utf-8') as file:
             content += file.read()
+        with open('app/test/forms.html', 'r', encoding='utf-8') as file:
+            content += file.read()
     except FileNotFoundError:
         print("Error: El archivo no fue encontrado en la ruta especificada.")
         content = "<h1>Archivo no encontrado</h1>"
@@ -133,3 +135,4 @@ def analyze_headers(domain: str):
     result = headers.analyze_headers(domain)
 
     return result
+

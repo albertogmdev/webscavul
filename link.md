@@ -32,8 +32,12 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/r
 https://web.dev/articles/referrer-best-practices?hl=es
 https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/referrer
 
+# BASE DE DATOS
+
+
 # OTROS
 ## Token CSRF
 https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#token-based-mitigation
 ## CSP
 https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html#defense-against-xss
+

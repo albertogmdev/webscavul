@@ -135,7 +135,14 @@ class Field:
         field_class = ""
         field_name = ""
 
-        return f"{form_id}{form_class}{form_action}"
+        if self.id and self.id != "":
+            field_id = f"{self.id.lower().replace('-', '').replace('_', '')} "
+        if self.classname and len(self.classname) > 0:
+            field_class = f"{" ".join(self.classname).lower().replace('-', '').replace('_', '')} "
+        if self.name and self.name != "":
+            field_name = self.name.lower().replace('-', '').replace('_', '')
+
+        return f"{field_id}{field_class}{field_name}"
 
 class Link:
     def __init__(self, href: str, text: str, rel: str, target: str, code: str):

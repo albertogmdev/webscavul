@@ -100,12 +100,11 @@ def check_referrer(headers: dict) -> dict:
     
     if referrer:
         isCorrect = False
-        referrer_value = re.split('; |, ', referrer.lower())
         
-        if referrer_value not in ['no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade', 'strict-origin']:
+        if referrer not in ['no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade', 'strict-origin']:
             isCorrect = True
             
-        return {"enabled": True, "correct": isCorrect, "value": referrer_value}
+        return {"enabled": True, "correct": isCorrect, "value": referrer}
     else:
         return {"enabled": False, "correct": False}
 

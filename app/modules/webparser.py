@@ -10,11 +10,11 @@ def parse_webpage(webpage: WebPage):
     
     soup = BeautifulSoup(webpage.content, 'html.parser')
 
-    parse_forms(soup, webpage)
     parse_links(soup, webpage) 
     parse_metatags(soup, webpage)
     parse_scripttags(soup, webpage)
     parse_linktags(soup, webpage)
+    parse_forms(soup, webpage)
 
 def parse_metatags(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing metas in the webpage")
@@ -24,7 +24,7 @@ def parse_metatags(soup: BeautifulSoup, webpage: WebPage):
         meta_http = meta.get('http-equiv')
         meta_charset = meta.get('charset')
         if meta_name and meta_content or meta_http or meta_charset:
-            print('[META]', meta_name, meta_content, meta_http, meta_charset)
+            #print('[META]', meta_name, meta_content, meta_http, meta_charset)
             webpage.add_meta_tag(MetaTag(meta_name, meta_content, meta_http, meta_charset, meta))
 
 def parse_forms(soup: BeautifulSoup, webpage: WebPage):
@@ -48,7 +48,7 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
         if form_type: 
             formObject.set_form_type(form_type)
 
-        print('[FORM]', form_id, form_action, form_method)
+        #print('[FORM]', form_id, form_action, form_method, form_type)
         webpage.add_form(formObject)
 
         form_index += 1
@@ -63,7 +63,7 @@ def parse_fields(form: BeautifulSoup, formObject: Form):
         field_value = field.get('value', '')
         field_placeholder = field.get('placeholder', '')
 
-        print('[FIELD]', field_id, field_class, field_name, field_type, field_value, field_placeholder)
+        #print('[FIELD]', field_id, field_class, field_name, field_type, field_value, field_placeholder)
         formObject.add_field(Field(field_id, field_class, field_name, field_type, field_value, field_placeholder, field))
 
 def parse_links(soup: BeautifulSoup, webpage: WebPage):
@@ -74,7 +74,7 @@ def parse_links(soup: BeautifulSoup, webpage: WebPage):
         link_target = link.get('target')
         link_rel = link.get('rel')
 
-        print('[LINK]', link_href, link_text, link_rel, link_target)
+        #print('[LINK]', link_href, link_text, link_rel, link_target)
         webpage.add_link(Link(link_href, link_text, link_rel, link_target, link))
 
 def parse_linktags(soup: BeautifulSoup, webpage: WebPage):
@@ -87,7 +87,7 @@ def parse_linktags(soup: BeautifulSoup, webpage: WebPage):
         link_crossorigin = link.get('crossorigin')
         link_external = link_href and webpage.domain not in link_href and not link_href.startswith('/')
 
-        print('[LINKTAG]', link_href, link_rel, link_type, link_integrity, link_crossorigin, link_external)
+        #print('[LINKTAG]', link_href, link_rel, link_type, link_integrity, link_crossorigin, link_external)
         webpage.add_link_tag(LinkTag(link_href, link_rel, link_type, link_external, link_integrity, link_crossorigin, link))
 
 def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
@@ -100,17 +100,18 @@ def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
         script_content = script.string
         script_external = script_src and webpage.domain not in script_src and not script_src.startswith('/')
 
-        print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
+        #print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
         webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, script))
         
 def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
     form_type = None
+    total_count = form.fields_count["total"]
+    url_type = None
     keywords = {
         "login": ["login", "signin", "auth", "access", "identify", "acceso", "acceder", "entrar", "identificacion", "identificar", "autenticar", "autenticacion", "iniciosesion", "iniciarsesion"],
         "signup": ["register", "signup", "createaccount", "newaccount", "accountnew", "join", "registro", "registrar", "crearcuenta", "crearunacuenta", "nuevacuenta", "cuentanueva", "registrarme", "alta", "unirse", "unirme"],
         "search": ["search", "query", "find", "busqueda", "buscar", "buscador"],
-        "contact": ["contact", "message", "inquiry", "feedback",  "support", "help", "contacto", "ayuda", "soporte", "consulta"],
-
+        "contact": ["contact", "message", "inquiry", "feedback",  "support", "help", "contacto", "contactar", "ayuda", "soporte", "consulta"],
     }
     types = {
         "login": 0,
@@ -119,17 +120,6 @@ def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
         "contact": 0
     }
 
-    print(form.fields_count)
-    total_count = form.fields_count["total"]
-    # Checkt form id, action and classes
-    formated_info = form.format_form_info()
-    if formated_info and formated_info != "":   
-        for type, values in keywords.items():
-            for keyword in values:
-                if keyword in formated_info: 
-                    types[type] += 10
-                    break
-    
     # Check page url
     paths = url.split("/")
     if paths and len(paths) > 1:
@@ -137,6 +127,20 @@ def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
         for type, values in keywords.items():
             for keyword in values:
                 if keyword in url_path: 
+                    url_type = type
+                    types[type] += 10
+                    break
+    
+    # Checkt form id, action and classes
+    formated_info = form.format_form_info()
+    if formated_info and formated_info != "":   
+        for type, values in keywords.items():
+            for keyword in values:
+                if keyword in formated_info:
+                    # When there is a form in other URL form
+                    if url_type and url_type != type: 
+                        types[url_type] -= 10
+                        url_type = None
                     types[type] += 10
                     break
 
@@ -171,7 +175,6 @@ def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
         for keyword in values:
             for info in submit_info:
                 if keyword in info: 
-                    print(f"ENCONTRADO {keyword} - {type} >>>>>>>>>> {info}")
                     types[type] += 5
                     type_found = True
                     break
@@ -212,13 +215,15 @@ def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
     allowed_login_inputs = ["password", "text", "submit", "email", "checkbox", "button"]
     if total_count <= 5 and total_count >= 2: types["login"] += 2
     else: types["login"] -= 3
+    if form.method and form.method != "" and form.method == "POST": types["login"] += 1
     for input, count in form.fields_count.items():
         if input == "password" and count == 1: types["login"] += 3
         elif input == "password"and count != 1: types["login"] -= 5
         if input not in allowed_login_inputs: types["login"] -= 1
-    
+
     # Heuristic for signup form
     if total_count <= 5 and total_count >= 2: types["signup"] += 2
+    if form.method and form.method != "" and form.method == "POST": types["signup"] += 1
     for input, count in form.fields_count.items():
         if input == "password" and count == 1: types["signup"] += 1
         elif input == "password" and count == 2: types["signup"] += 4
@@ -226,27 +231,34 @@ def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
     # Heuristic for search form, usually a 2 or 3 inputs, with a text/search input and maybe a submit
     allowed_search_inputs = ["search", "text", "submit"]
     if total_count <= 3: types["search"] += 2
+    if form.method and form.method != "" and form.method == "GET": types["search"] += 1
     else: types["search"] -= 3
     for input, count in form.fields_count.items(): 
         if input == "search": types["search"] += 5
         elif input not in allowed_search_inputs: types["search"] -= 1
     
     # Heuristic for contact form
+    if form.method and form.method != "" and form.method == "GET": types["contact"] += 1
+    if "textarea" in form.fields_count: types["contact"] += 3
 
-
-    max_value = -100
-    selected_type = None
-    multiple_types = False
-    for type, value in types.items():
-        if value > max_value:
-            max_value = value
-            selected_type = type
-            multiple_types = False
-        if value == max_value and value > 0:
-            multiple_types = True
+    # max_value = -100
+    # selected_type = None
+    # multiple_types = False
+    # for type, value in types.items():
+    #     if value > max_value:
+    #         max_value = value
+    #         selected_type = type
+    #         multiple_types = False
+    #     if value == max_value and value > 0:
+    #         multiple_types = True
     
-    print(types)
-    print(formated_info)
-    print(selected_type)
+    max_score = max(types.values())
+    likely_types = [t for t, score in types.items() if score == max_score]
+    if max_score > 6:
+        if len(likely_types) == 1: form_type = likely_types[0]
+        elif len(likely_types) > 1: form_type = " / ".join(likely_types)
+        else: form_type = "unidentify"
+    else:
+        form_type = "unidentify"
 
     return form_type
