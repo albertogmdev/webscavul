@@ -33,7 +33,7 @@ https://web.dev/articles/referrer-best-practices?hl=es
 https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/referrer
 
 # BASE DE DATOS
-
+https://mariadb.com/docs/connectors/mariadb-connector-python
 
 # OTROS
 ## Token CSRF

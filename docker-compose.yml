@@ -4,12 +4,17 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: webscavul_app
+    depends_on:
+      - mariadb
     restart: always
     env_file: .env
     ports:
       - 8000:80
     volumes:
       - ./:/webscavul
+    networks:
+      - backend
+      
   mariadb:
     image: mariadb
     container_name: webscavul_mariadb
@@ -23,7 +28,12 @@ services:
       - data:/var/lib/mysql
       - ./db_scripts:/docker-entrypoint-initdb.d/:ro
     ports:
-      - "3306:3306"
+      - "${DB_PORT}:3306"
+    networks:
+      - backend
 
 volumes:
   data:
+
+networks:
+  backend:

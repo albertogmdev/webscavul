@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Response, HTTPException
 
 import app.utils.utils as utils
+import app.utils.database as database
 import app.modules.headers as headers
 import app.modules.ssl as ssl
 import app.modules.tls as tls
@@ -12,22 +13,37 @@ from app.core.webpage import WebPage
 from app.core.session import Session
 
 app = FastAPI()
+db_connection = None
 
-@app.get("/test")
-def test(domain: str):
-    result = None
-    session = Session()
+@app.on_event("startup")
+def startup_event():
+    print("INFO: Intializing db connection")
+    global db_connection
+    db_connection = database.create_db_connection()
 
-    if session.set_domain(domain):
-        if session.make_request():
-            print(session.__dict__)
-            result = session.response.headers
-        else:
-            raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
-    else:
-        raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
+    ## Usage of connection pool
+    # pool = database.create_db_pool(5)
+    # connection = pool.get_connection()
+    # cur = conn.cursor()
+    # Execute actions in DB
+    # cur.close()
+    # conn.close()
 
-    return result
+@app.on_event("shutdown")
+def shutdown_event():
+    global db_connection
+    if db_connection:
+        db_connection.close()
+
+@app.get("/test-db")
+def test():
+    cursor = db_connection.cursor()
+    sql = "INSERT INTO Report (title) VALUES (?)"
+    data = ("Test Report",)
+    result = cursor.execute(sql, data)
+    db_connection.commit()
+    cursor.close()
+    return {"response": result}
 
 @app.get("/custom-headers")
 def custom_headers():
@@ -80,6 +96,8 @@ async def analyze(domain: str):
             await webpage.load_webpage(session.full_domain)
             webparser.parse_webpage(webpage)
             result_syntax = webanalyzer.analyze_webpage(webpage, result_headers)
+
+            return database.create_report(db_connection, session, result_information, result_headers, result_ssl)
 
             result = {
                 "information": result_information,

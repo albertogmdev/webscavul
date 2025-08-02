@@ -1,18 +1,46 @@
--- MariaDB script
+USE webscavul;
 
--- Drop the database if it exists
-DROP DATABASE IF EXISTS social_media;
+-- Tables
+DROP TABLE IF EXISTS Report;
+DROP TABLE IF EXISTS List;
+DROP TABLE IF EXISTS Task;
 
--- Create the database
-CREATE DATABASE social_media;
+-- Create Schema
+CREATE TABLE Report (
+    id VARCHAR(255) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    domain VARCHAR(255) NOT NULL,
+    full_domain VARCHAR(255) NOT NULL,
+    protocol VARCHAR(6) NOT NULL,
+    ip JSON,
+    port INT,
+    hsts JSON,
+    csp JSON,
+    xframe JSON,
+    content_type JSON,
+    cookie JSON,
+    cache JSON,
+    xss JSON,
+    referrer JSON,
+    permissions JSON,
+    refresh JSON
+);
 
--- Use the database
-USE social_media;
+CREATE TABLE List (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    report_id VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    FOREIGN KEY (report_id) REFERENCES Report(id)
+        ON DELETE CASCADE
+);
 
--- Table 'UserData'
-DROP TABLE IF EXISTS UserData;
-
-CREATE TABLE UserData (
-    id CHAR(36) NOT NULL PRIMARY KEY,
-    data VARCHAR(160) NOT NULL
+CREATE TABLE Task (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    list_id INT,
+    title VARCHAR(255) NOT NULL,
+    archived BOOLEAN NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    FOREIGN KEY (list_id) REFERENCES List(id)
+        ON DELETE SET NULL
 );
