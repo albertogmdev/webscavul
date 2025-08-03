@@ -5,6 +5,13 @@ DROP TABLE IF EXISTS Report;
 DROP TABLE IF EXISTS List;
 DROP TABLE IF EXISTS Task;
 
+-- Create User
+CREATE TABLE User (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
 -- Create Schema
 CREATE TABLE Report (
     id VARCHAR(255) PRIMARY KEY,
@@ -39,8 +46,12 @@ CREATE TABLE Task (
     id INT AUTO_INCREMENT PRIMARY KEY,
     list_id INT,
     title VARCHAR(255) NOT NULL,
+    type VARCHAR(10) NOT NULL,
+    severity VARCHAR(50) NOT NULL,
+    location VARCHAR(255),
+    details  VARCHAR(255),
+    status INT NOT NULL,
     archived BOOLEAN NOT NULL,
-    status VARCHAR(255) NOT NULL,
     FOREIGN KEY (list_id) REFERENCES List(id)
         ON DELETE SET NULL
 );

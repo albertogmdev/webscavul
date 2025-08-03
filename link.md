@@ -34,6 +34,8 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/r
 
 # BASE DE DATOS
 https://mariadb.com/docs/connectors/mariadb-connector-python
+https://mariadb-corporation.github.io/mariadb-connector-python/cursor.html#cursor-methods
+
 
 # OTROS
 ## Token CSRF

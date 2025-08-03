@@ -1,4 +1,7 @@
 from fastapi import FastAPI, Response, HTTPException
+from app.core.webpage import WebPage
+from app.core.session import Session
+from app.core.models import ListCreate, ListUpdate, Task
 
 import app.utils.utils as utils
 import app.utils.database as database
@@ -8,9 +11,6 @@ import app.modules.tls as tls
 import app.modules.information as information
 import app.modules.webparser as webparser
 import app.modules.webanalyzer as webanalyzer
-
-from app.core.webpage import WebPage
-from app.core.session import Session
 
 app = FastAPI()
 db_connection = None
@@ -34,16 +34,6 @@ def shutdown_event():
     global db_connection
     if db_connection:
         db_connection.close()
-
-@app.get("/test-db")
-def test():
-    cursor = db_connection.cursor()
-    sql = "INSERT INTO Report (title) VALUES (?)"
-    data = ("Test Report",)
-    result = cursor.execute(sql, data)
-    db_connection.commit()
-    cursor.close()
-    return {"response": result}
 
 @app.get("/custom-headers")
 def custom_headers():
@@ -97,7 +87,7 @@ async def analyze(domain: str):
             webparser.parse_webpage(webpage)
             result_syntax = webanalyzer.analyze_webpage(webpage, result_headers)
 
-            return database.create_report(db_connection, session, result_information, result_headers, result_ssl)
+            return database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities)
 
             result = {
                 "information": result_information,
@@ -124,33 +114,213 @@ async def analyze_syntax():
     
     return result
 
-@app.get("/analyze/tls")
-def analyze_tls(domain: str):
-    result = {}
-    
-    is_valid = utils.is_domain_valid(domain)
-    if not is_valid["result"]:
-        error = is_valid["error"] if hasattr(is_valid, "error") else is_valid["status_code"]
-        raise HTTPException(status_code=400, detail=error)
-    
-    domain = is_valid["domain"]
+# Database operations endpoints
+## REPORT
+@app.get("/report/{report_id}")
+def get_report(report_id: str):
+    report = database.get_report_by_id(db_connection, report_id)
+    if not report:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Informe {report_id} no encontrado."
+            }
+        )
 
-    result = tls.analyze_tls(domain)
+    return {
+        "status": "success", 
+        "message": f"Informe {report_id} encontrado.",
+        "data": {"report": report}
+    }
 
-    return result
+@app.get("/report/{report_id}/board")
+def get_report_board(report_id: str):
+    if not database.get_report_by_id(db_connection, report_id):
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Reporte {report_id} no encontrado."
+            }
+        )
 
-@app.get("/analyze/headers")
-def analyze_headers(domain: str):
-    result = {}
-    
-    is_valid = utils.is_domain_valid(domain)
-    if not is_valid["result"]:
-        error = is_valid["error"] if hasattr(is_valid, "error") else is_valid["status_code"]
-        raise HTTPException(status_code=400, detail=error)
-    
-    domain = is_valid["domain"]
+    board = database.get_report_board(db_connection, report_id)
+    if not board:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Tablero del informe {report_id} no encontrado o no se encontraron listas de tareas."
+            }
+        )
 
-    result = headers.analyze_headers(domain)
+    return {
+        "status": "success", 
+        "message": f"Informe {report_id} encontrado.",
+        "data": {"board": board}
+    }
 
-    return result
+@app.delete("/report/{report_id}")
+def delete_report(report_id: str):
+    if not database.get_report_by_id(db_connection, report_id):
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Informe {report_id} no encontrado."
+            }
+        )
 
+    deleted = database.delete_report(db_connection, report_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"Error al eliminar el informe {report_id}"
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Informe {report_id} eliminado correctamente",
+        "data": {"report_id": report_id}
+    }
+
+## LIST
+@app.get("/list/{list_id}")
+def get_list(list_id: str):
+    list = database.get_list_by_id(db_connection, list_id)
+    if not list: 
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Lista {list_id} no encontrada."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Lista {list_id} encontrada.",
+        "data": {"list": list}
+    }
+
+@app.post("/list")
+def create_list(list: ListCreate):
+    list_id = database.create_list(db_connection, list)
+    if not list_id:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"Error al crear la lista {list.title}"
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Lista {list_id} creada correctamente.",
+        "data": {"list_id": list_id}
+    }
+
+@app.delete("/list/{list_id}")
+def delete_list(list_id: str):
+    deleted = database.delete_list(db_connection, list_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"Error al eliminar la lista {list_id}."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Lista {list_id} eliminada correctamente.",
+        "data": {"list_id": list_id}
+    }
+
+@app.put("/list/{list_id}")
+def update_list(list_id: str, list: ListUpdate):
+    update_fields = {key: value for key, value in list.dict().items() if value is not None}
+    # Fields to update should be greater than 1 because report_id is mandatory and cannot be changed
+    if not update_fields or len(update_fields) <= 1:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": "No se proporcionaron campos válidos a actualizar."
+            }
+        )
+
+    new_list = database.update_list(db_connection, list_id, update_fields)
+    if not new_list:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"Error al actualizar la lista {list_id} o el 'report_id' es incorrecto."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Lista {list_id} actualizada correctamente.",
+        "data": {"list": new_list}
+    }
+
+## TASK
+@app.get("/task/{task_id}")
+def get_task(task_id: str):
+    task = database.get_task_by_id(db_connection, task_id)
+    if not task: 
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Tarea {task_id} no encontrada."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Tarea {task_id} encontrada.",
+        "data": {"task": task}
+    }
+
+@app.post("/task")
+def create_task(report_id: str, task: Task):
+    if not database.get_report_by_id(db_connection, report_id):
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Informe {report_id} no encontrado."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"",
+        "data": {}
+    }
+
+@app.delete("/task/{task_id}")
+def delete_task(report_id: str, task_id: str):
+    if not database.get_report_by_id(db_connection, report_id):
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Informe {report_id} no encontrado."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"",
+        "data": {}
+    }
