@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /webscavul
 
-COPY requirements.txt .
+COPY ./api/requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
@@ -16,4 +16,4 @@ EXPOSE 80
 
 COPY . .
 
-CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "80", "--reload", "--reload-dir", "app"]
+CMD ["uvicorn", "api.main:api", "--host", "0.0.0.0", "--port", "80", "--reload", "--reload-dir", "api"]

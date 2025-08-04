@@ -1,9 +1,9 @@
 services:
-  app:
+  api:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: webscavul_app
+    container_name: webscavul_api
     depends_on:
       - mariadb
     restart: always
