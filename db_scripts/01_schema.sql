@@ -38,13 +38,14 @@ CREATE TABLE List (
     id INT AUTO_INCREMENT PRIMARY KEY,
     report_id VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
+    archived BOOLEAN NOT NULL,
     FOREIGN KEY (report_id) REFERENCES Report(id)
         ON DELETE CASCADE
 );
 
 CREATE TABLE Task (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    list_id INT,
+    list_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     type VARCHAR(10) NOT NULL,
     severity VARCHAR(50) NOT NULL,

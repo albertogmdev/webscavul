@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, HTTPException
 from app.core.webpage import WebPage
 from app.core.session import Session
-from app.core.models import ListCreate, ListUpdate, Task
+from app.core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
 
 import app.utils.utils as utils
 import app.utils.database as database
@@ -207,6 +207,33 @@ def get_list(list_id: str):
         "data": {"list": list}
     }
 
+@app.get("/report/{report_id}/lists")
+def get_report_lists(report_id: str):
+    if not database.get_report_by_id(db_connection, report_id): 
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Informe {report_id} no encontrado."
+            }
+        )
+
+    lists = database.get_lists_by_report(db_connection, report_id)
+    if not lists: 
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Listas del reporte {report_id} no encontradas."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Listas de del reporte {report_id} encontradas.",
+        "data": {"lists": lists}
+    }
+
 @app.post("/list")
 def create_list(list: ListCreate):
     list_id = database.create_list(db_connection, list)
@@ -246,7 +273,6 @@ def delete_list(list_id: str):
 @app.put("/list/{list_id}")
 def update_list(list_id: str, list: ListUpdate):
     update_fields = {key: value for key, value in list.dict().items() if value is not None}
-    # Fields to update should be greater than 1 because report_id is mandatory and cannot be changed
     if not update_fields or len(update_fields) <= 1:
         raise HTTPException(
             status_code=404,
@@ -291,36 +317,93 @@ def get_task(task_id: str):
         "data": {"task": task}
     }
 
-@app.post("/task")
-def create_task(report_id: str, task: Task):
-    if not database.get_report_by_id(db_connection, report_id):
+@app.get("/list/{list_id}/tasks")
+def get_list_tasks(list_id: str):
+    if not database.get_list_by_id(db_connection, list_id): 
         raise HTTPException(
             status_code=404,
             detail={
                 "status": "error",
-                "message": f"Informe {report_id} no encontrado."
+                "message": f"Lista {list_id} no encontrada."
+            }
+        )
+
+    tasks = database.get_tasks_by_list(db_connection, list_id)
+    if not tasks: 
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": f"Tareas de las lista {list_id} no encontradas."
             }
         )
 
     return {
         "status": "success", 
-        "message": f"",
-        "data": {}
+        "message": f"Tareas de las lista {list_id} encontradas.",
+        "data": {"tasks": tasks}
+    }
+
+@app.post("/task")
+def create_task(task: TaskCreate):
+    task_id = database.create_task(db_connection, task)
+    if not task_id:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"Error al crear la lista {task.title}"
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Tarea '{task.title}' creada correctamente.",
+        "data": {"task_id": task_id}
     }
 
 @app.delete("/task/{task_id}")
-def delete_task(report_id: str, task_id: str):
-    if not database.get_report_by_id(db_connection, report_id):
+def delete_task(task_id: str):
+    deleted = database.delete_task(db_connection, task_id)
+    if not deleted:
         raise HTTPException(
-            status_code=404,
+            status_code=500,
             detail={
                 "status": "error",
-                "message": f"Informe {report_id} no encontrado."
+                "message": f"Error al eliminar la tarea {task_id}."
             }
         )
 
     return {
         "status": "success", 
-        "message": f"",
-        "data": {}
+        "message": f"Tarea {task_id} eliminada correctamente.",
+        "data": {"task_id": task_id}
+    }
+
+@app.put("/task/{task_id}")
+def update_task(task_id: str, task: TaskUpdate):
+    update_fields = {key: value for key, value in task.dict().items() if value is not None}
+    if not update_fields or len(update_fields) <= 1:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": "No se proporcionaron campos válidos a actualizar."
+            }
+        )
+
+    new_task = database.update_task(db_connection, task_id, update_fields)
+    if not new_task:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"Error al actualizar la tarea {task_id} o el 'list_id' es incorrecto."
+            }
+        )
+
+    return {
+        "status": "success", 
+        "message": f"Tarea {task_id} actualizada correctamente.",
+        "data": {"task": new_task}
     }

@@ -8,7 +8,7 @@ import datetime
 
 from mariadb import ConnectionPool
 from dotenv import load_dotenv
-from app.core.models import ListCreate, ListUpdate, Task
+from app.core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
 
 report_fields = ["id", "title", "created_at", "domain", "full_domain", "protocol", "ip", "port", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
 report_json_fields = ["hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
@@ -199,6 +199,25 @@ def get_list_by_id(db_connection, list_id: str):
     except Exception as e:
         return False
 
+def get_lists_by_report(db_connection, report_id: str):
+    list_list = []
+    try: 
+        cursor = db_connection.cursor()
+
+        sql = "SELECT * FROM List WHERE report_id = ?"
+        data = (report_id,)
+        cursor.execute(sql, data)
+        lists = cursor.fetchall()
+
+        for item_list in lists:
+            list = dict(zip(list_fields, item_list))
+            list_list.append(list)
+
+        cursor.close()
+        return list_list if len(list_list) > 0 else None
+    except Exception as e:
+        return False
+
 def create_list(db_connection, list: ListCreate):
     try: 
         cursor = db_connection.cursor()
@@ -228,7 +247,6 @@ def delete_list(db_connection, list_id: str):
         cursor.close()
         return deleted
     except Exception as e:
-        print(e)
         return False
 
 def update_list(db_connection, list_id: str, fields: dict):
@@ -238,7 +256,6 @@ def update_list(db_connection, list_id: str, fields: dict):
         columns = ", ".join([f"{key} = ?" for key in fields.keys()])
         sql = f"UPDATE List SET {columns} WHERE id = ?"
         data = list(fields.values()) + [list_id]
-        print(data)
         cursor.execute(sql, data)
         db_connection.commit()
         
@@ -255,7 +272,7 @@ def update_list(db_connection, list_id: str, fields: dict):
         cursor.close()
         return dict(zip(list_fields, row)) if row else None
     except Exception as e:
-        print(e)
+        db_connection.rollback()
         return False
 
 # Task CRUD
@@ -271,4 +288,81 @@ def get_task_by_id(db_connection, task_id: str):
         cursor.close()
         return dict(zip(task_fields, row)) if row else None
     except Exception as e:
+        return False
+
+def get_tasks_by_list(db_connection, list_id: str):
+    task_list = []
+    try: 
+        cursor = db_connection.cursor()
+
+        sql = "SELECT * FROM Task WHERE list_id = ?"
+        data = (list_id,)
+        cursor.execute(sql, data)
+        tasks = cursor.fetchall()
+
+        for item_task in tasks:
+            task = dict(zip(task_fields, item_task))
+            task_list.append(task)
+
+        return task_list if len(task_list) > 0 else None
+    except Exception as e:
+        return False
+
+def create_task(db_connection, task: TaskCreate):
+    try: 
+        cursor = db_connection.cursor()
+
+        sql = "INSERT INTO Task \
+            (list_id, title, type, severity, location, details, status, archived) \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id"
+        task_location = task.location if task.location else ""
+        task_details = task.details if task.details else ""
+        data = (task.list_id, task.title, task.type, task.severity, task_location, task_details, task.status, task.archived)
+        cursor.execute(sql, data)
+        result_task = cursor.fetchone()
+
+        cursor.close()
+        return result_task[0] if result_task else None
+    except Exception as e:
+        return False
+
+def delete_task(db_connection, task_id: str):
+    try: 
+        cursor = db_connection.cursor()
+
+        sql = "DELETE FROM Task WHERE id = ?"
+        data = (task_id,)
+        cursor.execute(sql, data)
+        db_connection.commit()
+        deleted = cursor.rowcount > 0
+
+        cursor.close()
+        return deleted
+    except Exception as e:
+        return False
+
+def update_task(db_connection, task_id: str, fields: dict):
+    try: 
+        cursor = db_connection.cursor()
+
+        columns = ", ".join([f"{key} = ?" for key in fields.keys()])
+        sql = f"UPDATE Task SET {columns} WHERE id = ?"
+        data = list(fields.values()) + [task_id]
+        cursor.execute(sql, data)
+        db_connection.commit()
+        
+        if cursor.rowcount == 0:
+            cursor.close()
+            return None
+        
+        # Get updated list new data
+        result_sql = "SELECT * FROM Task WHERE id = ?"
+        result_data = (task_id,)
+        cursor.execute(result_sql, result_data)
+        row = cursor.fetchone()
+
+        cursor.close()
+        return dict(zip(task_fields, row)) if row else None
+    except Exception as e:
+        db_connection.rollback()
         return False
