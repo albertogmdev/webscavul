@@ -79,8 +79,8 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
 
         # Create default list
         list_sql = "INSERT INTO List \
-            (report_id, title) \
-            VALUES (?, ?) RETURNING id"
+            (report_id, title, archived) \
+            VALUES (?, ?, 0) RETURNING id"
         list_data = (report_id, "TAREAS")
         cursor.execute(list_sql, list_data)
         result_list = cursor.fetchone()

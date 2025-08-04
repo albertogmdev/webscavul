@@ -54,5 +54,5 @@ CREATE TABLE Task (
     status INT NOT NULL,
     archived BOOLEAN NOT NULL,
     FOREIGN KEY (list_id) REFERENCES List(id)
-        ON DELETE SET NULL
+        ON DELETE CASCADE
 );
