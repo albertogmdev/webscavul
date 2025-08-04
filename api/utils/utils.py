@@ -1,6 +1,7 @@
 import re
 import unicodedata
 import requests
+
 from requests.exceptions import RequestException
     
 def is_valid_domain(domain: str) -> bool:

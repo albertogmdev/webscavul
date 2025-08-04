@@ -1,8 +1,9 @@
 import socket
 import ssl
-from datetime import datetime
 import OpenSSL
-import app.utils.utils as utils
+import api.utils.utils as utils
+
+from datetime import datetime
 
 def analyze_ssl(domain: str, schema: str) -> dict:
     if schema == "http":

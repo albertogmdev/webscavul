@@ -1,21 +1,20 @@
 from fastapi import FastAPI, Response, HTTPException
-from app.core.webpage import WebPage
-from app.core.session import Session
-from app.core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
+from api.core.webpage import WebPage
+from api.core.session import Session
+from api.core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
 
-import app.utils.utils as utils
-import app.utils.database as database
-import app.modules.headers as headers
-import app.modules.ssl as ssl
-import app.modules.tls as tls
-import app.modules.information as information
-import app.modules.webparser as webparser
-import app.modules.webanalyzer as webanalyzer
+import api.utils.utils as utils
+import api.utils.database as database
+import api.modules.headers as headers
+import api.modules.ssl as ssl
+import api.modules.information as information
+import api.modules.webparser as webparser
+import api.modules.webanalyzer as webanalyzer
 
-app = FastAPI()
+api = FastAPI()
 db_connection = None
 
-@app.on_event("startup")
+@api.on_event("startup")
 def startup_event():
     print("INFO: Intializing db connection")
     global db_connection
@@ -29,13 +28,13 @@ def startup_event():
     # cur.close()
     # conn.close()
 
-@app.on_event("shutdown")
+@api.on_event("shutdown")
 def shutdown_event():
     global db_connection
     if db_connection:
         db_connection.close()
 
-@app.get("/custom-headers")
+@api.get("/custom-headers")
 def custom_headers():
     headers = {
         "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
@@ -52,15 +51,15 @@ def custom_headers():
     content = "<!DOCTYPE html><html lang='en'><head><title>Document</title></head><body>"
     
     try:
-        with open('app/test/links.html', 'r', encoding='utf-8') as file:
+        with open('api/test/links.html', 'r', encoding='utf-8') as file:
             content += file.read()
-        with open('app/test/script_tags.html', 'r', encoding='utf-8') as file:
+        with open('api/test/script_tags.html', 'r', encoding='utf-8') as file:
             content += file.read()
-        with open('app/test/link_tags.html', 'r', encoding='utf-8') as file:
+        with open('api/test/link_tags.html', 'r', encoding='utf-8') as file:
             content += file.read()
-        with open('app/test/metas.html', 'r', encoding='utf-8') as file:
+        with open('api/test/metas.html', 'r', encoding='utf-8') as file:
             content += file.read()
-        with open('app/test/forms.html', 'r', encoding='utf-8') as file:
+        with open('api/test/forms.html', 'r', encoding='utf-8') as file:
             content += file.read()
     except FileNotFoundError:
         print("Error: El archivo no fue encontrado en la ruta especificada.")
@@ -72,7 +71,7 @@ def custom_headers():
     
     return Response(content=content, media_type="text/html", headers=headers)
 
-@app.get("/analyze")
+@api.get("/analyze")
 async def analyze(domain: str):
     session = Session()
     result = {}
@@ -102,7 +101,7 @@ async def analyze(domain: str):
     
     return result
 
-@app.get("/analyze/syntax")
+@api.get("/analyze/syntax")
 async def analyze_syntax():
     result = {}
     headers = {"hsts":{"enabled":False},"csp":{"enabled":False},"xframe":{"enabled":False},"content_type":{"enabled":False,"correct":False},"cookie":{"enabled":False},"cache":{"enabled":False,"correct":False},"xss":{"enabled":False,"correct":False},"referrer":{"enabled":False,"correct":False},"permissions":{"enabled":False,"correct":False},"refresh":{"enabled":False}}
@@ -116,7 +115,7 @@ async def analyze_syntax():
 
 # Database operations endpoints
 ## REPORT
-@app.get("/report/{report_id}")
+@api.get("/report/{report_id}")
 def get_report(report_id: str):
     report = database.get_report_by_id(db_connection, report_id)
     if not report:
@@ -134,7 +133,7 @@ def get_report(report_id: str):
         "data": {"report": report}
     }
 
-@app.get("/report/{report_id}/board")
+@api.get("/report/{report_id}/board")
 def get_report_board(report_id: str):
     if not database.get_report_by_id(db_connection, report_id):
         raise HTTPException(
@@ -161,7 +160,7 @@ def get_report_board(report_id: str):
         "data": {"board": board}
     }
 
-@app.delete("/report/{report_id}")
+@api.delete("/report/{report_id}")
 def delete_report(report_id: str):
     if not database.get_report_by_id(db_connection, report_id):
         raise HTTPException(
@@ -189,7 +188,7 @@ def delete_report(report_id: str):
     }
 
 ## LIST
-@app.get("/list/{list_id}")
+@api.get("/list/{list_id}")
 def get_list(list_id: str):
     list = database.get_list_by_id(db_connection, list_id)
     if not list: 
@@ -207,7 +206,7 @@ def get_list(list_id: str):
         "data": {"list": list}
     }
 
-@app.get("/report/{report_id}/lists")
+@api.get("/report/{report_id}/lists")
 def get_report_lists(report_id: str):
     if not database.get_report_by_id(db_connection, report_id): 
         raise HTTPException(
@@ -234,7 +233,7 @@ def get_report_lists(report_id: str):
         "data": {"lists": lists}
     }
 
-@app.post("/list")
+@api.post("/list")
 def create_list(list: ListCreate):
     list_id = database.create_list(db_connection, list)
     if not list_id:
@@ -252,7 +251,7 @@ def create_list(list: ListCreate):
         "data": {"list_id": list_id}
     }
 
-@app.delete("/list/{list_id}")
+@api.delete("/list/{list_id}")
 def delete_list(list_id: str):
     deleted = database.delete_list(db_connection, list_id)
     if not deleted:
@@ -270,7 +269,7 @@ def delete_list(list_id: str):
         "data": {"list_id": list_id}
     }
 
-@app.put("/list/{list_id}")
+@api.put("/list/{list_id}")
 def update_list(list_id: str, list: ListUpdate):
     update_fields = {key: value for key, value in list.dict().items() if value is not None}
     if not update_fields or len(update_fields) <= 1:
@@ -299,7 +298,7 @@ def update_list(list_id: str, list: ListUpdate):
     }
 
 ## TASK
-@app.get("/task/{task_id}")
+@api.get("/task/{task_id}")
 def get_task(task_id: str):
     task = database.get_task_by_id(db_connection, task_id)
     if not task: 
@@ -317,7 +316,7 @@ def get_task(task_id: str):
         "data": {"task": task}
     }
 
-@app.get("/list/{list_id}/tasks")
+@api.get("/list/{list_id}/tasks")
 def get_list_tasks(list_id: str):
     if not database.get_list_by_id(db_connection, list_id): 
         raise HTTPException(
@@ -344,7 +343,7 @@ def get_list_tasks(list_id: str):
         "data": {"tasks": tasks}
     }
 
-@app.post("/task")
+@api.post("/task")
 def create_task(task: TaskCreate):
     task_id = database.create_task(db_connection, task)
     if not task_id:
@@ -362,7 +361,7 @@ def create_task(task: TaskCreate):
         "data": {"task_id": task_id}
     }
 
-@app.delete("/task/{task_id}")
+@api.delete("/task/{task_id}")
 def delete_task(task_id: str):
     deleted = database.delete_task(db_connection, task_id)
     if not deleted:
@@ -380,7 +379,7 @@ def delete_task(task_id: str):
         "data": {"task_id": task_id}
     }
 
-@app.put("/task/{task_id}")
+@api.put("/task/{task_id}")
 def update_task(task_id: str, task: TaskUpdate):
     update_fields = {key: value for key, value in task.dict().items() if value is not None}
     if not update_fields or len(update_fields) <= 1:

@@ -1,4 +1,4 @@
-from app.core.webpage import WebPage, Vulnerability
+from api.core.webpage import WebPage, Vulnerability
 import re
 
 def analyze_webpage(webpage: WebPage, headers: dict) -> dict:

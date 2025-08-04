@@ -8,7 +8,7 @@ import datetime
 
 from mariadb import ConnectionPool
 from dotenv import load_dotenv
-from app.core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
+from api.core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
 
 report_fields = ["id", "title", "created_at", "domain", "full_domain", "protocol", "ip", "port", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
 report_json_fields = ["hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]

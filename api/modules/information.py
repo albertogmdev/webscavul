@@ -1,4 +1,5 @@
 import socket
+
 from urllib.parse import urlparse
 
 def get_information():

@@ -1,6 +1,6 @@
-import app.utils.utils as utils
+import api.utils.utils as utils
 
-from app.core.webpage import WebPage, MetaTag, Form, Field, Link, ScriptTag, LinkTag
+from api.core.webpage import WebPage, MetaTag, Form, Field, Link, ScriptTag, LinkTag
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 

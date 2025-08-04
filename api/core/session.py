@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import RequestException
 
-import app.utils.utils as utils
+import api.utils.utils as utils
 
 class Session:
     def __init__(self):
