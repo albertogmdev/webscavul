@@ -1,7 +1,7 @@
 services:
   api:
     build: 
-      context: .
+      context: ./api
       dockerfile: Dockerfile
     container_name: webscavul_api
     depends_on:
@@ -11,10 +11,26 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ./:/webscavul
+      - ./api:/webscavul/api
     networks:
       - backend
       
+  app:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile.dev
+    container_name: webscavul_app
+    depends_on:
+      - api
+    restart: always
+    env_file: .env
+    ports:
+      - "${APP_PORT}:3000"
+    volumes:
+      - ./webapp:/webscavul/app
+    networks:
+      - backend
+
   mariadb:
     image: mariadb
     container_name: webscavul_mariadb
