@@ -1,17 +1,26 @@
 from fastapi import FastAPI, Response, HTTPException
-from api.core.webpage import WebPage
-from api.core.session import Session
-from api.core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
+from fastapi.middleware.cors import CORSMiddleware
+from core.webpage import WebPage
+from core.session import Session
+from core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
 
-import api.utils.utils as utils
-import api.utils.database as database
-import api.modules.headers as headers
-import api.modules.ssl as ssl
-import api.modules.information as information
-import api.modules.webparser as webparser
-import api.modules.webanalyzer as webanalyzer
+import utils.utils as utils
+import utils.database as database
+import modules.headers as headers
+import modules.ssl as ssl
+import modules.information as information
+import modules.webparser as webparser
+import modules.webanalyzer as webanalyzer
 
 api = FastAPI()
+origins = ["http://localhost", "http://localhost:3000"]
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,     
+    allow_methods=["*"],  
+    allow_headers=["*"],
+)
 db_connection = None
 
 @api.on_event("startup")
@@ -74,32 +83,23 @@ def custom_headers():
 @api.get("/analyze")
 async def analyze(domain: str):
     session = Session()
-    result = {}
 
     if session.set_domain(domain):
         if session.make_request():
             result_information = information.get_IP(session.full_domain, session.port)
             result_headers = headers.analyze_headers(session.response.headers)
             result_ssl = ssl.analyze_ssl(session.domain, session.schema)
+            
             webpage = WebPage(session.domain)
             await webpage.load_webpage(session.full_domain)
             webparser.parse_webpage(webpage)
-            result_syntax = webanalyzer.analyze_webpage(webpage, result_headers)
-
+            webanalyzer.analyze_webpage(webpage, result_headers)
+            
             return database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities)
-
-            result = {
-                "information": result_information,
-                "headers": result_headers,
-                "ssl": result_ssl,
-                "syntax": result_syntax
-            }
         else:
             raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
     else:
         raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
-    
-    return result
 
 @api.get("/analyze/syntax")
 async def analyze_syntax():

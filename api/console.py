@@ -1,6 +1,6 @@
 import sys
 import warnings
-import api.modules.headers as headers
+import modules.headers as headers
 
 warnings.filterwarnings("ignore")
 

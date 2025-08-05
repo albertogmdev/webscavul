@@ -1,7 +1,7 @@
 import socket
 import ssl
 import OpenSSL
-import api.utils.utils as utils
+import utils.utils as utils
 
 from datetime import datetime
 
