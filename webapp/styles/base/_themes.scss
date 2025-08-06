@@ -1,0 +1,23 @@
+:root {
+    --text: #ededed;
+    --background: #0a0a0a;
+    --primary: #c2a1de;
+    --secondary: #52247b;
+    --accent: #8532cd;
+
+    .theme--light {
+        --text: #121212;
+        --background: #f5f5f5;
+        --primary: #43215f;
+        --secondary: #b384db;
+        --accent: #8532cd;
+    }
+
+    .theme--dark {
+        --text: #ededed;
+        --background: #0a0a0a;
+        --primary: #c2a1de;
+        --secondary: #52247b;
+        --accent: #8532cd;
+    }
+}

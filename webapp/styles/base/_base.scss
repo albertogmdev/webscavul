@@ -1,0 +1,72 @@
+@use '../abstracts' as *;
+
+html {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  margin: 0;
+  padding: 0;
+
+  &.modal-open,
+  &.noscroll {
+    overflow: hidden;
+  }
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: $container-width;
+  margin: 0 auto;
+  padding: 0px 80px;
+
+  @media screen and (max-width: $desktop) {
+    padding: 0px 64px;
+  }
+
+  @media screen and (max-width: $tablet) {
+    padding: 0px 40px;
+  }
+
+  @media screen and (max-width: $mobile) {
+    padding: 0px 24px;
+  }
+}
+
+.container-fluid {
+  width: 100%;
+  max-width: $container-width;
+  margin: 0 auto;
+  padding: 0px;
+  overflow-x: hidden;
+}

@@ -1,0 +1,25 @@
+@mixin mask-icon($url: null, $bgColor: null) {
+  @if ($url) {
+    -webkit-mask-image: $url;
+    mask-image: $url;
+  }
+
+  @if ($bgColor) {
+    background-color: $bgColor;
+  }
+
+  -webkit-mask-position: center center;
+  mask-position: center center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+@mixin limit-lines($lines: 1) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  line-clamp: $lines;
+  -webkit-box-orient: vertical;
+}
