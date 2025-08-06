@@ -27,7 +27,8 @@ services:
     ports:
       - "${APP_PORT}:3000"
     volumes:
-      - ./webapp:/webscavul/app
+      - ./webapp:/webscavul/webapp
+      - /webscavul/webapp/node_modules
     networks:
       - backend
 
