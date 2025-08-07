@@ -1,0 +1,26 @@
+@use '../abstracts' as *;
+
+.input-domain{
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    margin: 0 auto;
+
+    .input-text {
+        width: 0;
+        flex: 1 0;
+        padding: 10px;
+        border: none;
+        background-color: grey;
+        border: 1px solid white;
+    }
+
+    .input-submit {
+        font-size: 18px;
+        width: 130px;
+        text-align: center;
+        padding: 16px 0px;
+        color: black;
+        background-color: white;
+    }
+}

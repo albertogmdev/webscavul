@@ -1,1 +1,10 @@
 @use '../abstracts' as *;
+
+@font-face {
+    font-family: 'Inter';
+    src: url('#{$base-url}/fonts/Inter.woff2') format('woff2'),
+        url('#{$base-url}/fonts/Inter.woff') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}

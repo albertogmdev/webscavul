@@ -1,13 +1,40 @@
 :root {
     --text: #ededed;
-    --background: #0a0a0a;
+    --background: #0f0020;
+    --background2: #473d57;
+    --background3: #7f7981;
+    //--background: #0a0a0a;
+    --backgrounSecondary: #acacac;
+    --backgroundInverted: #f5f5f5;
+    --line: #6d6d6d;
+
+    --primary-base: 194, 161, 222; /* #c2a1de */
+    --secondary-base: 82, 36, 123; /* #52247b */
+    --accent-base: 133, 50, 205; /* #8532cd */
+    
     --primary: #c2a1de;
+    --primary-25: rgba(var(--primary-base), 0.25);
+    --primary-50: rgba(var(--primary-base), 0.5);
+    --primary-75: rgba(var(--primary-base), 0.75);
     --secondary: #52247b;
+    --secondary-25: rgba(var(--secondary-base), 0.25);
+    --secondary-50: rgba(var(--secondary-base), 0.5);
+    --secondary-75: rgba(var(--secondary-base), 0.75);
     --accent: #8532cd;
+    --accent-25: rgba(var(--accent-base), 0.25);
+    --accent-50: rgba(var(--accent-base), 0.5);
+    --accent-75: rgba(var(--accent-base), 0.75);
 
     .theme--light {
         --text: #121212;
         --background: #f5f5f5;
+        --backgrounSecondary: #0a0a0a;
+        --line: #7c7c7c;
+
+        --primary-base: 67, 33, 95; /* #43215f */
+        --secondary-base: 179, 132, 219; /* #b384db */
+        --accent-base: 133, 50, 205; /* #8532cd */
+
         --primary: #43215f;
         --secondary: #b384db;
         --accent: #8532cd;
@@ -16,6 +43,13 @@
     .theme--dark {
         --text: #ededed;
         --background: #0a0a0a;
+        --backgrounSecondary: #f5f5f5;
+        --line: #6d6d6d;
+
+        --primary-base: 194, 161, 222;
+        --secondary-base: 82, 36, 123;
+        --accent-base: 133, 50, 205;
+
         --primary: #c2a1de;
         --secondary: #52247b;
         --accent: #8532cd;

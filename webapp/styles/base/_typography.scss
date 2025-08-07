@@ -1,1 +1,63 @@
 @use '../abstracts' as *;
+
+h1, h2, h3, h4, h5, h6, .font-title {
+    font-weight: bold !important;
+}
+
+.text-xxl {
+    font-family: $geist;
+    font-size: 48px;
+    font-weight: 500;
+}
+
+.text-xl {
+    font-family: $geist;
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.text-lg {
+    font-family: $geist;
+    font-size: 26px;
+    font-weight: 500;
+}
+
+.text-sm {
+    font-family: $geist;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.text-md {
+    font-family: $geist;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.text-s {
+    font-family: $geist;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.text-xs {
+    font-family: $geist;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.text-xxs {
+    font-family: $geist;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.body1 {
+    font-family: $geist;
+    font-size: 16px;
+}
+
+.body2 {
+    font-family: $geist;
+    font-size: 14px;
+}

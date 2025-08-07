@@ -6,8 +6,13 @@ $desktop: 1439px;
 
 /// Navigation
 /// @type Number
-$navbarHeight: 64px;
+$navbarHeight: 100px;
 $navbarHeight--mobile: 64px;
 
 /// Container
 $container-width: 1440px;
+
+$inter: "Inter";
+$geist: "Geist";
+
+$base-url: "" !default;

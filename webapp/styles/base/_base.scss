@@ -1,7 +1,11 @@
 @use '../abstracts' as *;
 
-html {
+* {
   box-sizing: border-box;
+  color: white;
+}
+
+html {
   scroll-behavior: smooth;
 }
 
@@ -9,11 +13,17 @@ body {
   background-color: var(--background);
   margin: 0;
   padding: 0;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 
   &.modal-open,
   &.noscroll {
     overflow: hidden;
   }
+}
+
+.page {
+  margin-top: var(--navbarHeight);
+  width: 100%;
 }
 
 a {
@@ -24,6 +34,7 @@ button {
   border: none;
   background: none;
   cursor: pointer;
+  font-family: $geist;
 }
 
 ul,
