@@ -95,7 +95,21 @@ async def analyze(domain: str):
             webparser.parse_webpage(webpage)
             webanalyzer.analyze_webpage(webpage, result_headers)
             
-            return database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities)
+            response = database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities)
+            if response["status"] != 200:
+                raise HTTPException(
+                    status_code=500,
+                    detail={
+                        "status": "error",
+                        "message": f"Error al crear el informe para el dominio {domain}"
+                    }
+                )
+            else:
+                return {
+                    "status": "success", 
+                    "message": f"Informe creado con éxito.",
+                    "data": response["data"]
+                }
         else:
             raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
     else:

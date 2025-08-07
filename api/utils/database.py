@@ -113,7 +113,7 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         db_connection.rollback()
         return {"status": 500, "error": e}
     
-    return {"status": "ok", "data": {"report_id": report_id}}
+    return {"status": 200, "data": {"report_id": report_id}}
 
 def get_report_by_id(db_connection, report_id):
     try: 
