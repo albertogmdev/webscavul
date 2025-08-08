@@ -34,9 +34,9 @@ def check_hsts(headers: dict) -> dict:
     
     if hsts:
         hsts_value = re.split('; |, ', hsts.lower())
-        return { "enabled": True, "correct": True, "value": hsts_value }
+        return { "enabled": True, "correct": True, "value": hsts_value, "severity": "Medium" }
     else:
-        return { "enabled": False }
+        return { "enabled": False, "severity": "Medium" }
     
 def check_content(headers: dict) -> dict:
     content = headers.get("x-content-type-options")
@@ -46,9 +46,9 @@ def check_content(headers: dict) -> dict:
         if content.lower() == "nosniff": 
             isCorrect = True
         
-        return {"enabled": True, "correct": isCorrect, "value": content}
+        return {"enabled": True, "correct": isCorrect, "value": content, "severity": "Medium"}
     else:
-        return {"enabled": False, "correct": False}
+        return {"enabled": False, "correct": False, "severity": "Medium"}
 
 def check_xss(headers: dict) -> dict:
     xss = headers.get("x-xss-protection")
@@ -60,9 +60,9 @@ def check_xss(headers: dict) -> dict:
         if "1" in xss_value and "mode=block" in xss_value:
             isCorrect = True
             
-        return {"enabled": True, "correct": isCorrect, "value": xss}
+        return {"enabled": True, "correct": isCorrect, "value": xss, "severity": "Recommendation"}
     else:
-        return {"enabled": False, "correct": False}
+        return {"enabled": False, "correct": False, "severity": "Recommendation"}
 
 def check_xframe(headers: dict) -> dict:
     xframe = headers.get("x-frame-options")
@@ -73,17 +73,17 @@ def check_xframe(headers: dict) -> dict:
         if xframe.lower() == "deny" or xframe.lower() == "sameorigin":
             isCorrect = True
             
-        return {"enabled": True, "correct": isCorrect, "value": xframe}
+        return {"enabled": True, "correct": isCorrect, "value": xframe, "severity": "Recommendation"}
     else:
-        return {"enabled": False}
+        return {"enabled": False, "severity": "Recommendation"}
     
 def check_refesh(headers: dict) -> dict:
     refresh = headers.get("refresh")
     
     if refresh:
-        return {"enabled": True, "value": refresh}
+        return {"enabled": True, "value": refresh, "severity": "Recommendation"}
     else:
-        return {"enabled": False}   
+        return {"enabled": False, "severity": "Recommendation"}   
 
 def check_permissions(headers: dict) -> dict:
     permission = headers.get("permissions-policy")
@@ -91,9 +91,9 @@ def check_permissions(headers: dict) -> dict:
     if permission:
         permission_value = re.split('; |, ', permission.lower())
 
-        return {"enabled": True, "correct": True, "value": permission_value}
+        return {"enabled": True, "correct": True, "value": permission_value, "severity": "Recommendation"}
     else:
-        return {"enabled": False, "correct": False}
+        return {"enabled": False, "correct": False, "severity": "Recommendation"}
 
 def check_referrer(headers: dict) -> dict:
     referrer = headers.get("referrer-policy")
@@ -104,9 +104,9 @@ def check_referrer(headers: dict) -> dict:
         if referrer not in ['no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade', 'strict-origin']:
             isCorrect = True
             
-        return {"enabled": True, "correct": isCorrect, "value": referrer}
+        return {"enabled": True, "correct": isCorrect, "value": referrer, "severity": "Recommendation"}
     else:
-        return {"enabled": False, "correct": False}
+        return {"enabled": False, "correct": False, "severity": "Recommendation"}
 
 def check_cache(headers: dict) -> dict:
     cache = headers.get("cache-control")
@@ -118,9 +118,9 @@ def check_cache(headers: dict) -> dict:
         if "no-store" in cache_value:
             isCorrect = True
             
-        return {"enabled": True, "correct": isCorrect, "value": cache_value}
+        return {"enabled": True, "correct": isCorrect, "value": cache_value, "severity": "Medium"}
     else:
-        return {"enabled": False, "correct": False}
+        return {"enabled": False, "correct": False, "severity": "Medium"}
 
 def check_cookie(headers: dict) -> dict:
     cookie = headers.get("set-cookie")
@@ -132,15 +132,15 @@ def check_cookie(headers: dict) -> dict:
         if "secure" in cookie_value and "httponly" in cookie_value:
             isCorrect = True
             
-        return {"enabled": True, "correct": isCorrect, "value": cookie_value}
+        return {"enabled": True, "correct": isCorrect, "value": cookie_value, "severity": "Medium"}
     else:
-        return {"enabled": False}
+        return {"enabled": False, "severity": "Medium"}
     
 def check_csp(headers: dict) -> dict:
     csp = headers.get("content-security-policy")
     
     if csp:
         csp_value = re.split('; |, ', csp.lower())
-        return {"enabled": True, "correct": True, "value": csp_value}
+        return {"enabled": True, "correct": True, "value": csp_value, "severity": "High"}
     else:
-        return {"enabled": False}
+        return {"enabled": False, "severity": "High"}
