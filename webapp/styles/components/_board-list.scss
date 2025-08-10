@@ -1,0 +1,46 @@
+@use '../abstracts' as *;
+
+.board-list {
+    .list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        border-bottom: 1px solid $primaryBorder;
+
+        .list-title {
+            width: 0;
+            flex: 1 0;
+            padding-right: 10px;
+            font-size: 14px;
+        }
+
+        .list-actions {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .action-count {
+                font-size: 11px;
+                font-weight: 500;
+                color: $primaryText;
+                background-color: $tertiaryBg;
+                width: 25px;
+                height: 25px;
+                text-align: center;
+                line-height: 25px;
+                border-radius: 50%;
+            }
+
+            .actions-menu {
+                position: absolute;
+                left: 100%;
+            }
+        }
+    }
+
+    .task-list {
+        padding: 24px 12px;
+    }
+}

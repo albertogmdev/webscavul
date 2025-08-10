@@ -1,0 +1,19 @@
+@use '../abstracts' as *;
+
+.actions-menu {
+    background-color: $secondaryBg;
+    border: 1px solid $primaryBorder;
+    min-width: max-content;
+    padding: 10px;
+    border-radius: $radius;
+
+    .action-item {
+        padding: 8px;
+        font-size: 12px;
+        color: $primaryText;
+
+        &:hover {
+            background-color: $secondaryBg;
+        }
+    }
+}

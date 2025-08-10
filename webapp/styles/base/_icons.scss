@@ -1,1 +1,61 @@
 @use '../abstracts' as *;
+
+.icon {
+    display: block;
+}
+
+.icon-arrowup {
+    @include mask-icon(url("#{$base-url}/img/icon-arrowup.svg"));
+}
+
+.icon-arrowdown {
+    @include mask-icon(url("#{$base-url}/img/icon-arrowdown.svg"));
+}
+
+.icon-arrowright {
+    @include mask-icon(url("#{$base-url}/img/icon-arrowright.svg"));
+}
+
+.icon-arrowleft {
+    @include mask-icon(url("#{$base-url}/img/icon-arrowleft.svg"));
+}
+
+.icon-arrowlink {
+    @include mask-icon(url("#{$base-url}/img/icon-arrowlink.svg"));
+}
+
+.icon-chevronup {
+    @include mask-icon(url("#{$base-url}/img/icon-chevronup.svg"));
+}
+
+.icon-chevrondown {
+    @include mask-icon(url("#{$base-url}/img/icon-chevrondown.svg"));
+}
+
+.icon-chevronright {
+    @include mask-icon(url("#{$base-url}/img/icon-chevronright.svg"));
+}
+
+.icon-chevronleft {
+    @include mask-icon(url("#{$base-url}/img/icon-chevronleft.svg"));
+}
+
+.icon-close {
+    @include mask-icon(url("#{$base-url}/img/icon-close.svg"));
+}
+
+.icon-menuburger {
+    @include mask-icon(url("#{$base-url}/img/icon-menuburger.svg"));
+}
+
+.icon-link {
+    @include mask-icon(url("#{$base-url}/img/icon-link.svg"));
+}
+
+.icon-check {
+    @include mask-icon(url("#{$base-url}/img/icon-check.svg"));
+}
+
+.icon-more {
+    @include mask-icon(url("#{$base-url}/img/icon-more.svg"));
+}

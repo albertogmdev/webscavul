@@ -1,0 +1,12 @@
+@use '../abstracts' as *;
+
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: $navbarHeight;
+    background-color: $primaryBg;
+    border-bottom: 1px solid $primaryBorder;
+    z-index: 1;
+}

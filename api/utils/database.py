@@ -10,8 +10,8 @@ from mariadb import ConnectionPool
 from dotenv import load_dotenv
 from core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
 
-report_fields = ["id", "title", "created_at", "domain", "full_domain", "protocol", "ip", "port", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
-report_json_fields = ["hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
+report_fields = ["id", "title", "created_at", "domain", "full_domain", "protocol", "ip", "vulnerabilities", "port", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
+report_json_fields = ["ip", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
 
 list_fields = ["id", "report_id", "title"]
 
@@ -71,10 +71,11 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         report_port = session.port if session.port else 0
 
         # Insert report info
+        print(ssl)
         report_sql = "INSERT INTO Report \
-            (id, title, domain, full_domain, protocol, ip, port, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        report_data = (report_id, report_title , session.domain, session.full_domain, session.schema, json.dumps(information), report_port, json.dumps(headers['hsts']), json.dumps(headers['csp']), json.dumps(headers['xframe']), json.dumps(headers['content_type']), json.dumps(headers['cookie']), json.dumps(headers['cache']), json.dumps(headers['xss']), json.dumps(headers['referrer']), json.dumps(headers['permissions']), json.dumps(headers['refresh']))
+            (id, title, domain, full_domain, protocol, ip, vulnerabilities, port, ssl_info, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        report_data = (report_id, report_title , session.domain, session.full_domain, session.schema, json.dumps(information), len(vulnerabilities), report_port, json.dumps(ssl), json.dumps(headers['hsts']), json.dumps(headers['csp']), json.dumps(headers['xframe']), json.dumps(headers['content_type']), json.dumps(headers['cookie']), json.dumps(headers['cache']), json.dumps(headers['xss']), json.dumps(headers['referrer']), json.dumps(headers['permissions']), json.dumps(headers['refresh']))
         cursor.execute(report_sql, report_data)
 
         # Create default list
@@ -107,9 +108,11 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         db_connection.commit()
         cursor.close()
     except mariadb.Error as e:
+        print(f"ERROR: {e}")
         db_connection.rollback()
         return {"status": 500, "error": e}
     except Exception as e:
+        print(f"ERROR: {e}")
         db_connection.rollback()
         return {"status": 500, "error": e}
     
@@ -223,8 +226,8 @@ def create_list(db_connection, list: ListCreate):
         cursor = db_connection.cursor()
 
         sql = "INSERT INTO List \
-            (report_id, title) \
-            VALUES (?, ?) RETURNING id"
+            (report_id, title, archived) \
+            VALUES (?, ?, 0) RETURNING id"
         data = (list.report_id, list.title)
         cursor.execute(sql, data)
         result_list = cursor.fetchone()
@@ -232,6 +235,7 @@ def create_list(db_connection, list: ListCreate):
         cursor.close()
         return result_list[0] if result_list else None
     except Exception as e:
+        print(f"ERROR: {e}")
         return False
 
 def delete_list(db_connection, list_id: str):

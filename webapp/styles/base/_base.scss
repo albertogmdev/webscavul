@@ -2,7 +2,7 @@
 
 * {
   box-sizing: border-box;
-  color: white;
+  color: $primaryText;
 }
 
 html {
@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  background-color: var(--background);
+  background-color: $primaryBg;
   margin: 0;
   padding: 0;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -22,8 +22,16 @@ body {
 }
 
 .page {
-  margin-top: var(--navbarHeight);
+  padding-top: $navbarHeight + 48px;
   width: 100%;
+}
+
+.ptext {
+  color: $primaryText;
+}
+
+.stext {
+  color: $secondaryText
 }
 
 a {

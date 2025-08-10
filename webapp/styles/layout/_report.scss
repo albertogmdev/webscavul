@@ -1,0 +1,154 @@
+@use '../abstracts' as *;
+
+.page-report {
+    .report-hero {
+        margin-bottom: 48px;
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+
+            .header-content {
+                .report-title {
+                    margin-bottom: 12px;
+                }
+            }
+        }
+
+        .card-body {
+            display: flex;
+            flex-wrap: wrap;
+
+            .info-item {
+                width: 25%;
+
+                .label,
+                .value {
+                    font-size: 14px;
+                }
+
+                .label {
+                    font-weight: 700;
+                    margin-bottom: 8px;
+                }
+            }
+        }
+
+        .resume-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 24px;
+
+            .resume-card {
+                padding: 24px;
+                width: calc(100% / 3 - (16px * 2 / 3));
+
+                .resume-title {
+                    font-size: 18px;
+                    margin-bottom: 24px;
+                }
+
+                .resume-value {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+
+    .report-information {
+        margin-bottom: 24px;
+
+        .information-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+
+            .content-col {
+                width: calc(100% / 2 - 12px);
+
+                .info-table {
+                    border: 1px solid $primaryBorder;
+
+                    .table-header {
+                        font-size: 18px;
+                        color: $primaryText;
+                        padding: 8px 16px; 
+                        border-bottom: 1px solid $primaryBorder;
+                        background-color: $cardSecondaryBg;
+                    }
+
+                    .table-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 8px 16px; 
+                        border-bottom: 1px solid $primaryBorder;
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        .value {
+                            width: 0;
+                            flex: 1 0;
+                            font-size: 14px;
+                            padding-left: 30px;
+                            word-wrap: break-word;
+                            text-align: right;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .report-headers {
+        .headers-list {
+            .header-item {
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                border: 1px solid $primaryBorder;
+                border-radius: 8px;
+                margin-bottom: 16px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                .item-content {
+                    width: 0;
+                    flex: 1 0;
+                    padding-right: 30px;
+
+                    .item-title {
+                        font-size: 18px;
+                        margin-bottom: 16px;
+                    }
+
+                    .item-value {
+                        font-family: monospace;
+                        font-size: 13px;
+                        padding: 8px;   
+                        border-radius: 8px;
+                        word-wrap: break-word;
+                        background-color: $cardSecondaryBg;
+                    }
+
+                    .item-description {
+                        font-size: 14px;
+                        margin-bottom: 8px;
+                        color: $secondaryText;
+                    }
+                }
+
+                .item-chip {
+                    min-width: 120px;
+                    text-align: center;
+                }
+            }
+        }
+    }
+}

@@ -6,4 +6,16 @@
 @use "base/typography";
 @use "base/icons";
 
-@use "components/input-domain"
+@use "components/input-domain";
+@use "components/card";
+@use "components/button";
+@use "components/task";
+@use "components/actions-menu";
+@use "components/board-list";
+@use "components/chip";
+
+@use "layout/board";
+@use "layout/home";
+@use "layout/report";
+@use "layout/footer";
+@use "layout/header";

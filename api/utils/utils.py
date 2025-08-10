@@ -1,8 +1,5 @@
 import re
 import unicodedata
-import requests
-
-from requests.exceptions import RequestException
     
 def is_valid_domain(domain: str) -> bool:
     regex = re.compile(
@@ -33,3 +30,13 @@ def remove_accents(text: str) -> str:
     nfkd_form = unicodedata.normalize('NFKD', text)
     without_accents = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
     return without_accents
+
+def format_json(obj):
+    if isinstance(obj, dict):
+        return {format_json(k): format_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [format_json(elem) for elem in obj]
+    elif isinstance(obj, bytes):
+        return obj.decode('utf-8')
+    else:
+        return obj

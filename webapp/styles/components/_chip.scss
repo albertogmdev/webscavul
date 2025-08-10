@@ -1,0 +1,74 @@
+@use '../abstracts' as *;
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 4px;
+    padding: 4px 8px;
+    border: 1px solid;
+
+    .chip-text {
+        font-weight: 700;
+        font-size: 12px;
+        max-width: 200px;
+        word-wrap: break-word;
+    }
+
+    &.chip--regular {
+        border-color: $primaryBorder;
+
+        .chip-text {
+            font-weight: 500;
+            color: $primaryText;
+        }
+    }
+
+    &.chip--correct,
+    &.chip--success,
+    &.chip--secure {
+        background-color: $successBg;
+        border-color: $successBorder;
+
+        .chip-text {
+            color: $successText;
+        }
+    }
+
+    &.chip--error,
+    &.chip--critical {
+        background-color: $criticalBg;
+        border-color: $criticalBorder;
+        
+        .chip-text {
+            color: $criticalText;
+        }
+    }
+
+    &.chip--warning {
+        background-color: $warningBg;
+        border-color: $warningBorder;
+        
+        .chip-text {
+            color: $warningText;
+        }
+    }
+
+    &.chip--info {
+        background-color: $infoBg;
+        border-color: $infoBorder;
+        
+        .chip-text {
+            color: $infoText;
+        }
+    }
+
+    &.chip--type {
+        background-color: $secondaryBg;
+        border: none;
+        
+        .chip-text {
+            color: $primaryAccentText;
+            font-weight: 500;
+        }
+    }
+}

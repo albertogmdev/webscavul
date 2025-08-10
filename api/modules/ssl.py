@@ -20,13 +20,13 @@ def analyze_ssl(domain: str, schema: str) -> dict:
         'issuer': dict(x509.get_issuer().get_components()),
         'serial_number': x509.get_serial_number(),
         'version': x509.get_version(),
-        'not_before': datetime.strptime(x509.get_notBefore().decode('utf-8'), '%Y%m%d%H%M%SZ'),
-        'not_after': datetime.strptime(x509.get_notAfter().decode('utf-8'), '%Y%m%d%H%M%SZ'),
+        'not_before': x509.get_notBefore().decode('utf-8'),
+        'not_after': x509.get_notAfter().decode('utf-8'),
         'tls_version': tls['version'],
         'tls_cipher': tls['cipher'],
     }
 
-    return result
+    return utils.format_json(result)
 
 def get_certificate(context, host, port=443, timeout=10):
     conn = socket.create_connection((host, port))

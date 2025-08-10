@@ -1,0 +1,47 @@
+@use '../abstracts' as *;
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: $primaryAccent;
+    color: $primaryText;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    
+    &:hover {
+        background-color: $primaryAccentHover;
+    }
+    
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    &.button--secondary {
+        border: 1px solid $primaryText;
+        color: $primaryText;
+        
+        &:hover {
+            color: $inverseText;
+            background-color: $primaryText;
+        }
+    }
+}
+
+.action-button {
+    padding: 2.5px;
+    border-radius: 50%;
+
+    .icon {
+        width: 20px;
+        height: 20px;
+        background-color: $primaryText;
+    }
+    
+    &:hover {
+        background-color: $cardSecondaryBg;
+    }
+}

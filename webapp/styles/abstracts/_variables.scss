@@ -1,3 +1,94 @@
+:root {
+    --primary-bg: #0F172A;
+    --secondary-bg: #1E293B;
+    --tertiary-bg: #334155;
+    --quaternary-bg: #475569;
+    --card-bg: #1E293B;
+    --card-secondarybg: #334155;
+    --shadow: #F9FAFB;
+    --contrast: 255, 255, 255;
+
+    --primary-text: #F8FAFC;
+    --secondary-text: #CBD5E1;
+    --muted-text: #94A3B8;
+    --inverse-text: #0F172A;
+
+    --primary-border: #475569;
+    --secondary-border: #64748B;
+
+    --critical-text: #EF4444;
+    --critical-bg: #7f1d1d94;
+    --critical-border: #991B1B;
+    --warning-text: #F59E0B;
+    --warning-bg: #78360f8b;
+    --warning-border: #92400E;
+    --success-text: #10b994;
+    --success-bg: #064e3b63;
+    --success-border: #065F46;
+    --info-text: #3B82F6;
+    --info-bg: #1e3b8a79;
+    --info-border: #1E40AF;
+
+    --primary-accent: #1D4ED8;
+    --primary-accent-hover: #153e95;
+    --primary-accent-text: #2568f7;
+    --secondary-accent: #8B5CF6;
+    --tertiary-accent: #F97316;
+
+    &.theme-light {
+        --primary-bg: #F9FAFB;
+        --secondary-bg: #F3F4F6;
+        --tertiary-bg: #FFFFFF;
+        --quaternary-bg: #FFFFFF;
+        --card-bg: #FFFFFF;
+        --shadow: #0F172A;
+        --contrast: 0, 0, 0;
+
+        --primary-text: #111827;
+        --secondary-text: #6B7280;
+        --muted-text: #9CA3AF;
+        --inverse-text: #FFFFFF;
+
+        --primary-border: #E5E7EB;
+        --secondary-border: #D1D5DB;
+        --subtle-border: #F3F4F6;
+
+        --primary-accent: #1D4ED8;
+        --primary-accent-hover: #153e95;
+        --secondary-accent: #7C3AED;
+        --tertiary-accent: #EA580C;
+    }
+}
+
+$primaryBg: var(--primary-bg);
+$secondaryBg: var(--secondary-bg);
+$tertiaryBg: var(--tertiary-bg);
+$quaternaryBg: var(--quaternary-bg);
+$cardBg: var(--card-bg);
+$cardSecondaryBg: var(--card-secondarybg);
+$shadow: var(--shadow);
+$primaryText: var(--primary-text);
+$secondaryText: var(--secondary-text);
+$mutedText: var(--muted-text);
+$inverseText: var(--inverse-text);
+$primaryBorder: var(--primary-border);
+$secondaryBorder: var(--secondary-border);
+$successText: var(--success-text);
+$successBg: var(--success-bg);
+$successBorder: var(--success-border);
+$warningText: var(--warning-text);
+$warningBg: var(--warning-bg);
+$warningBorder: var(--warning-border);
+$criticalText: var(--critical-text);
+$criticalBg: var(--critical-bg);
+$criticalBorder: var(--critical-border);
+$infoText: var(--info-text);
+$infoBg: var(--info-bg);
+$infoBorder: var(--info-border);
+$primaryAccent: var(--primary-accent);
+$primaryAccentText: var(--primary-accent-text);
+$primaryAccentHover: var(--primary-accent-hover);
+
 /// Breakpoints
 /// @type Number
 $mobile: 743px;
@@ -6,7 +97,7 @@ $desktop: 1439px;
 
 /// Navigation
 /// @type Number
-$navbarHeight: 100px;
+$navbarHeight: 64px;
 $navbarHeight--mobile: 64px;
 
 /// Container
@@ -16,3 +107,4 @@ $inter: "Inter";
 $geist: "Geist";
 
 $base-url: "" !default;
+$radius: 12px !default;

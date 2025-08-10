@@ -1,0 +1,33 @@
+@use '../abstracts' as *;
+
+.task-item {
+    border: 1px solid $primaryBorder;
+    background-color: $tertiaryBg;
+    border-radius: $radius;
+    padding: 12px;
+    margin-bottom: 12px;
+    cursor: pointer;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &:hover {
+        border: 2px solid $primaryAccent;
+        padding: 11px;
+    }
+
+    .task-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 16px;
+    }
+
+    .task-title {
+        padding-right: 10px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+}

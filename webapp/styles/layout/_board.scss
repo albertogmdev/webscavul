@@ -1,0 +1,32 @@
+@use '../abstracts' as *;
+
+.page-board {
+    .board-hero {
+        margin-bottom: 48px;
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+
+            .header-content {
+                .report-title {
+                    margin-bottom: 12px;
+                }
+            }
+        }
+    }
+
+    .board-lists {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-y: auto;
+        overflow-x: auto;
+        gap: 24px;
+        padding-bottom: 50px;
+
+        .board-list {
+            padding: 0px;
+            min-width: calc(30% - 24px * 2 / 3);
+        }
+    }
+}

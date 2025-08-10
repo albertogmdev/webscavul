@@ -19,7 +19,6 @@ export async function fetchData(endpoint, options = {}) {
     }
     
     try {
-        console.log(`${BASE_URL}${endpoint}`, fetchConfig)
         let responseData = {}
         const response = await fetch(`${BASE_URL}${endpoint}`, fetchConfig)
         
@@ -47,6 +46,7 @@ export async function fetchData(endpoint, options = {}) {
     }
 }
 
+// REPORT API CALLS
 export const createReport = async (scanDomain) => {
     try {
         const response = await fetchData(`/analyze?domain=${scanDomain}`)
@@ -66,3 +66,55 @@ export const getReport = async (reportId) => {
         throw error;
     }
 }   
+
+export const getReportBoard = async (reportId) => {
+    try {
+        const response = await fetchData(`/report/${reportId}/board`)
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+} 
+
+// TASK API CALLS
+export const getTask = async (taskId) => {
+    try {
+        const response = await fetchData(`/task/${taskId}`)
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+} 
+
+export const removeTask = async (taskId) => {
+    try {
+        const response = await fetchData(`/task/${taskId}`, {method: 'DELETE'})
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+}  
+
+// LIST API CALLS
+export const getList = async (listId) => {
+    try {
+        const response = await fetchData(`/list/${listId}`)
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+} 
+
+export const removeList = async (taskId) => {
+    try {
+        const response = await fetchData(`/list/${taskId}`, {method: 'DELETE'})
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+}  
