@@ -286,7 +286,8 @@ def delete_list(list_id: str):
 @api.put("/list/{list_id}")
 def update_list(list_id: str, list: ListUpdate):
     update_fields = {key: value for key, value in list.dict().items() if value is not None}
-    if not update_fields or len(update_fields) <= 1:
+    print(f"Update fields: {update_fields}")
+    if not update_fields or len(update_fields) < 1:
         raise HTTPException(
             status_code=404,
             detail={

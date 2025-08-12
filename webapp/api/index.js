@@ -137,6 +137,18 @@ export const deleteList = async (taskId) => {
     }
 }  
 
+export const updateList = async (listId, listName) => {
+    try {
+        const endpoint = `/list/${listId}`
+        const body = { "title": listName }
+        const response = await fetchData(endpoint, {method: 'PUT', body: body})
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+}  
+
 export const createList = async (listName, reportId) => {
     try {
         const body = {

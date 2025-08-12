@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react"
 import Task from "@components/Task/Task"
+import Modal from "@components/Modal/Modal"
 
 export default function BoardList({list, lists, onDeleteList, onDeleteTask, onUpdateList, onTaskMove}) {
     const [isActionMenuOpen, setActionMenuOpen] = useState(false)
+    const [openUpdateList, setOpenUpdateList] = useState(false)
+    const [newListName, setNewListName] = useState("")
 
     useEffect(() => {
 		const handleOutsideClick = (event) => {
@@ -24,7 +27,22 @@ export default function BoardList({list, lists, onDeleteList, onDeleteTask, onUp
         onDeleteList(list.id)
     }
 
+    const handleListUpdate = async (event) => {
+        event.preventDefault()
+        if (newListName.trim() === "" || newListName === list.title) {
+            console.warn("New list name is empty or unchanged.")
+            return
+        }
+
+        const isUpdated = await onUpdateList(list.id, newListName)
+        if (isUpdated) {
+            setOpenUpdateList(false)
+            setNewListName("")
+        }
+    }
+
     return (
+        <>
 		<div className="board-list card" data-list={list.id}>
             <div className="list-header">
                 <h3 className="list-title ptext">{list.title}</h3>
@@ -39,7 +57,7 @@ export default function BoardList({list, lists, onDeleteList, onDeleteTask, onUp
                     { isActionMenuOpen && (
                     <ul className="actions-menu">
                         <li className="action-item" onClick={handleListDelete}>Eliminar lista</li>
-                        <li className="action-item" onClick={() => console.log("holaaaaa")}>Archivar lista</li>
+                        <li className="action-item" onClick={() => setOpenUpdateList(true)}>Editar lista</li>
                     </ul>
                     )}
                 </div>
@@ -57,5 +75,23 @@ export default function BoardList({list, lists, onDeleteList, onDeleteTask, onUp
                 ))}
             </ul>
         </div>
-	);
+        {openUpdateList && (
+            <Modal
+                title={`Editar la lista ${list.title}`}
+                modalClass="modal-updatelist"
+                onModalClose={() => setOpenUpdateList(false)}
+            >
+                <form className="form-addlist" onSubmit={handleListUpdate}>
+                    <input
+                        className="addlist-name"
+                        type="text"
+                        onChange={(event) => { setNewListName(event.target.value) }}
+                        placeholder="Nombre de la lista"
+                    />
+                    <button className="button button-primary">Añadir</button>
+                </form>
+            </Modal>
+        )}
+        </>
+	)
 }

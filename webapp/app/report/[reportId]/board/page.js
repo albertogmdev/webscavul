@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from "react"
-import { getReportBoard, deleteList, createList, moveTask, deleteTask } from '@/api'
+import { getReportBoard, deleteList, createList, moveTask, deleteTask, updateList } from '@/api'
 import BoardList from '@components/BoardList/BoardList'
 import BoardFilter from '@components/BoardFilter/BoardFilter'
 import Modal from "@components/Modal/Modal"
@@ -109,8 +109,39 @@ export default function ReportBoard() {
 		}
 	}
 
-	const handleUpdateList = (listId) => {
-		console.log(listId)
+	const handleUpdateList = async (listId, newListName) => {
+		if (newListName === "") return
+
+		try {
+			const response = await updateList(listId, newListName)
+
+			if (response.status == 200) {
+				const afterUpdate = boardData.map((list) => {
+					if (list.id === listId) {
+						return {
+							...list,
+							title: newListName
+						}
+					}
+					return list
+				})
+
+				setBoardData(afterUpdate)
+				setFilteredBoardData(afterUpdate)
+				// When modifying the board data, we also need to apply the current filters
+				applyFilters(filterName, filterSeverity, afterUpdate)
+
+				return true
+			}
+			else {
+				console.error("Error updating list")
+				return false
+			}
+		}
+		catch (err) {
+			console.error("Error updating list:", err)
+			return false
+		}
 	}
 
 	const handleMoveTask = async (taskId, listOrigin, listDestination) => {
