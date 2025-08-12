@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from "react"
 import { getReportBoard, deleteList, createList, moveTask, deleteTask, updateList } from '@/api'
+import Link from 'next/link'
 import BoardList from '@components/BoardList/BoardList'
 import BoardFilter from '@components/BoardFilter/BoardFilter'
 import Modal from "@components/Modal/Modal"
@@ -295,6 +296,36 @@ export default function ReportBoard() {
 								</div>
 								<div className="chip chip--regular">
 									<span className="chip-text"><strong>Informe ID:</strong> {reportId}</span>
+								</div>
+							</div>
+							<div className="card-content">
+								<div className="content-info">
+									<div className="info-item info-tasks">
+										<span className="info-text">Tareas totales: </span>
+										<span className="info-count">
+											{boardData.reduce((acc, list) => acc + list.tasks.length, 0)}
+										</span>
+									</div>
+									<div className="info-item info-critical">
+										<span className="info-text">Tareas críticas: </span>
+										<span className="info-count">
+											{boardData.reduce((acc, list) => acc + list.tasks.filter(task => task.severity.toLowerCase() === "high").length, 0)}
+										</span>
+									</div>
+								</div>
+								<div className="content-buttons">
+									<Link 
+										href={`/report/${reportId}`} 
+										className="button button-primary"
+									>
+										Ver información general
+									</Link>
+									<Link 
+										href="/"
+										className="button button-secondary"
+									>
+										Ver mis informes
+									</Link>
 								</div>
 							</div>
 						</div>

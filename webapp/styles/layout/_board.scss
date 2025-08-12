@@ -14,6 +14,52 @@
                 }
             }
         }
+
+        .card-content {
+            display: flex;
+            align-items: flex-end;
+            margin-top: 40px;
+
+            .content-info {
+                width: 0;
+                flex: 1 0;
+
+                .info-item {
+                    width: fit-content;
+                    padding: 6px 10px;
+                    border-radius: 10px;
+
+                    .info-text,
+                    .info-count {
+                        font-size: 14px;
+                        font-weight: 600;
+                    }
+
+                    &.info-critical {
+                        margin-top: 10px;
+                        border: 1px solid $criticalBorder;
+
+                        >* {
+                            color: $criticalText;
+                        }
+                    }
+
+                    &.info-tasks {
+                        border: 1px solid $secondaryText;
+
+                        >* {
+                            color: $secondaryText;
+                        }
+                    }
+                }
+            }
+
+            .content-buttons {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+        }
     }
 
     .board-lists {
