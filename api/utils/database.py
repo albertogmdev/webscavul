@@ -138,6 +138,7 @@ def get_report_by_id(db_connection, report_id):
         cursor.close()
         return report
     except Exception as e:
+        print(e)
         return None
 
 def get_report_board(db_connection, report_id):

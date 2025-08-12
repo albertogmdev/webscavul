@@ -26,7 +26,22 @@
 
         .board-list {
             padding: 0px;
+            width: calc(30% - 24px * 2 / 3);
             min-width: calc(30% - 24px * 2 / 3);
+        }
+
+        .board-addlist {
+            align-self: flex-start;
+            border: 1px dashed $primaryBorder;
+            text-align: center;
+            padding: 40px 24px;
+            border-radius: $radius;
+            cursor: pointer;
+            transition: background-color .3s ease;
+
+            &:hover {
+                background-color: $secondaryBg;
+            }
         }
     }
 }

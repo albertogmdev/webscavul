@@ -25,7 +25,8 @@
 
     &.chip--correct,
     &.chip--success,
-    &.chip--secure {
+    &.chip--secure,
+    &.chip--low {
         background-color: $successBg;
         border-color: $successBorder;
 
@@ -64,7 +65,7 @@
 
     &.chip--type {
         background-color: $secondaryBg;
-        border: none;
+        border: 1px solid $primaryAccentText;
         
         .chip-text {
             color: $primaryAccentText;

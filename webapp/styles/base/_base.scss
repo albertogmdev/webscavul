@@ -3,6 +3,7 @@
 * {
   box-sizing: border-box;
   color: $primaryText;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 html {
@@ -42,7 +43,6 @@ button {
   border: none;
   background: none;
   cursor: pointer;
-  font-family: $geist;
 }
 
 ul,

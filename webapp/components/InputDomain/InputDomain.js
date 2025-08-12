@@ -26,5 +26,5 @@ export default function InputURL({onSubmitScan}) {
 				Escanear
 			</button>
 		</form>
-	);
+	)
 }

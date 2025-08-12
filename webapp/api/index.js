@@ -12,7 +12,7 @@ export async function fetchData(endpoint, options = {}) {
         headers, 
     }
 
-    if (options.body && method.toUpperCase() !== 'GET') fetchConfig.body = JSON.stringify(options.body)
+    if (options.body && options.method.toUpperCase() !== 'GET') fetchConfig.body = JSON.stringify(options.body)
     else if (options.body && method.toUpperCase() === 'GET') {
         console.log("ERROR: GET request receive a option body object. Query params should be used instead")
         delete fetchConfig.body
@@ -31,7 +31,6 @@ export async function fetchData(endpoint, options = {}) {
             }
         }
         else {
-            console.log(response)
             const errorData = await response.json().catch(() => ({ message: 'An unknown API error occurred.' }));
             responseData = {
                 status: response.status,
@@ -49,7 +48,8 @@ export async function fetchData(endpoint, options = {}) {
 // REPORT API CALLS
 export const createReport = async (scanDomain) => {
     try {
-        const response = await fetchData(`/analyze?domain=${scanDomain}`)
+        const endpoint = `/analyze?domain=${scanDomain}`
+        const response = await fetchData(endpoint)
         return response
     } catch (error) {
         console.error(`Failed to fetch from ${endpoint}:`, error);
@@ -59,7 +59,8 @@ export const createReport = async (scanDomain) => {
 
 export const getReport = async (reportId) => {
     try {
-        const response = await fetchData(`/report/${reportId}`)
+        const endpoint = `/report/${reportId}`
+        const response = await fetchData(endpoint)
         return response
     } catch (error) {
         console.error(`Failed to fetch from ${endpoint}:`, error);
@@ -69,10 +70,11 @@ export const getReport = async (reportId) => {
 
 export const getReportBoard = async (reportId) => {
     try {
-        const response = await fetchData(`/report/${reportId}/board`)
+        const endpoint = `/report/${reportId}/board`
+        const response = await fetchData(endpoint)
         return response
     } catch (error) {
-        console.error(`Failed to fetch from ${endpoint}:`, error);
+        console.error(`Failed to fetch data`, error);
         throw error;
     }
 } 
@@ -80,7 +82,8 @@ export const getReportBoard = async (reportId) => {
 // TASK API CALLS
 export const getTask = async (taskId) => {
     try {
-        const response = await fetchData(`/task/${taskId}`)
+        const endpoint = `/task/${taskId}`
+        const response = await fetchData(endpoint)
         return response
     } catch (error) {
         console.error(`Failed to fetch from ${endpoint}:`, error);
@@ -88,20 +91,34 @@ export const getTask = async (taskId) => {
     }
 } 
 
-export const removeTask = async (taskId) => {
+export const deleteTask = async (taskId) => {
     try {
-        const response = await fetchData(`/task/${taskId}`, {method: 'DELETE'})
+        const endpoint = `/task/${taskId}`
+        const response = await fetchData(endpoint, {method: 'DELETE'})
         return response
     } catch (error) {
         console.error(`Failed to fetch from ${endpoint}:`, error);
         throw error;
+    }
+}  
+
+export const moveTask = async (taskId, listId) => {
+    try {
+        const endpoint = `/task/${taskId}`
+        const body = { "list_id": listId }
+        const response = await fetchData(endpoint, {method: 'PUT', body: body})
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error)
+        throw error
     }
 }  
 
 // LIST API CALLS
 export const getList = async (listId) => {
     try {
-        const response = await fetchData(`/list/${listId}`)
+        const endpoint = `/list/${listId}`
+        const response = await fetchData(endpoint)
         return response
     } catch (error) {
         console.error(`Failed to fetch from ${endpoint}:`, error);
@@ -109,12 +126,28 @@ export const getList = async (listId) => {
     }
 } 
 
-export const removeList = async (taskId) => {
+export const deleteList = async (taskId) => {
     try {
-        const response = await fetchData(`/list/${taskId}`, {method: 'DELETE'})
+        const endpoint = `/list/${taskId}`
+        const response = await fetchData(endpoint, {method: 'DELETE'})
         return response
     } catch (error) {
         console.error(`Failed to fetch from ${endpoint}:`, error);
         throw error;
     }
 }  
+
+export const createList = async (listName, reportId) => {
+    try {
+        const body = {
+            "title": listName,
+            "report_id": reportId
+        }
+        const endpoint = `/list/`
+        const response = await fetchData(endpoint, {method: 'POST', body: body})
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+} 

@@ -396,7 +396,7 @@ def delete_task(task_id: str):
 @api.put("/task/{task_id}")
 def update_task(task_id: str, task: TaskUpdate):
     update_fields = {key: value for key, value in task.dict().items() if value is not None}
-    if not update_fields or len(update_fields) <= 1:
+    if not update_fields or len(update_fields) < 1:
         raise HTTPException(
             status_code=404,
             detail={
