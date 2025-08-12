@@ -25,7 +25,7 @@ def analyze_forms(webpage: WebPage):
         # CSRF Token not present
         if not form.has_csrf and not form.has_captcha:
             form_type = form.form_type
-            severity = 'High' if form_type not in ["login", "signup"] else 'Recommendation'
+            severity = 'High' if form_type not in ["login", "signup"] else 'Information'
             webpage.add_vulnerability(Vulnerability(
                 name=f"Formulario sin token CSRF implementado",
                 type="Form",
@@ -59,7 +59,7 @@ def analyze_forms(webpage: WebPage):
             webpage.add_vulnerability(Vulnerability(
                 name="Formulario con atributo 'action' vacío",
                 type="Form",
-                severity="Recommendation",
+                severity="Information",
                 location=form.id,
                 details="Se recomienda especificar explícitamente el valor del atributo 'action' para mejorar la claridad del código, la mantenibilidad y evitar posibles confusiones. El formulario enviará los datos a la misma URL de la página."
             ))
@@ -207,7 +207,7 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                     webpage.add_vulnerability(Vulnerability(
                         name=f"{'Meta tag' if is_header else 'Header'} tag Refresh activada",
                         type=f"{'Meta' if is_header else 'Header'}",
-                        severity="Recommendation",
+                        severity="Information",
                         location=url,
                         details="El uso de la cabecera 'Refresh' puede ser problemático, ya que puede permitir ataques de phishing.",
                     ))
@@ -229,7 +229,7 @@ def analyze_metatags(webpage: WebPage, headers: dict):
             Vulnerability(
                 name="Meta tag charset con valor no recomendado",
                 type="Meta",
-                severity="Recommendation",
+                severity="Information",
                 location=meta_charset.charset,
                 details="La meta tag 'charset' no está configurada como 'utf-8'. Este formato es recomendado y ampliamente utilizado para evitar problemas de codificación.",
             )

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from "react"
 import { getReportBoard, deleteList, createList, moveTask, deleteTask } from '@/api'
 import BoardList from '@components/BoardList/BoardList'
+import BoardFilter from '@components/BoardFilter/BoardFilter'
 import Modal from "@components/Modal/Modal"
 
 export default function ReportBoard() {
@@ -11,6 +12,9 @@ export default function ReportBoard() {
 	const reportId = params.reportId
 
 	const [boardData, setBoardData] = useState(null)
+	const [filteredBoardData, setFilteredBoardData] = useState(null)
+	const [filterName, setFilterName] = useState("")
+	const [filterSeverity, setFilterSeverity] = useState("")
 	const [listInfo, setListInfo] = useState(null)
 	const [openCreateList, setCreateListOpen] = useState(false)
 	const [error, setError] = useState(null)
@@ -24,6 +28,7 @@ export default function ReportBoard() {
 				const board = response.data.board
 
 				setBoardData(board)
+				setFilteredBoardData(board)
 			} catch (err) {
 				console.error("Error fetching report:", err)
 				setError(err.message)
@@ -47,7 +52,12 @@ export default function ReportBoard() {
 			const response = await deleteList(listId)
 
 			if (response.status == 200) {
-				setBoardData(boardData.filter((list) => list.id != listId))
+				const afterDelete = boardData.filter((list) => list.id != listId)
+				
+				setBoardData(afterDelete)
+				setFilteredBoardData(afterDelete)
+				// When modifying the board data, we also need to apply the current filters
+				applyFilters(filterName, filterSeverity, afterDelete)
 			}
 			else {
 				console.error("Error deleting list:", err)
@@ -63,25 +73,28 @@ export default function ReportBoard() {
 			const response = await deleteTask(taskId)
 
 			if (response.status == 200) {
-				setBoardData(prevBoardData => {
-					return prevBoardData.map((list, index) => {
-						if (list.id === listId) {
-							const tasksInOrigin = list.tasks
-							const taskIndex = tasksInOrigin.findIndex(task => task.id === taskId)
+				const afterDelete = boardData.map((list, index) => {
+					if (list.id === listId) {
+						const tasksInOrigin = list.tasks
+						const taskIndex = tasksInOrigin.findIndex(task => task.id === taskId)
 
-							if (taskIndex > -1) {
-								return {
-									...list,
-									tasks: [
-										...tasksInOrigin.slice(0, taskIndex),
-										...tasksInOrigin.slice(taskIndex + 1)
-									]
-								}
+						if (taskIndex > -1) {
+							return {
+								...list,
+								tasks: [
+									...tasksInOrigin.slice(0, taskIndex),
+									...tasksInOrigin.slice(taskIndex + 1)
+								]
 							}
 						}
-						return list
-					})
+					}
+					return list
 				})
+
+				setBoardData(afterDelete)
+				setFilteredBoardData(afterDelete)
+				// When modifying the board data, we also need to apply the current filters
+				applyFilters(filterName, filterSeverity, afterDelete)
 
 				return true
 			}
@@ -106,40 +119,41 @@ export default function ReportBoard() {
 
 			if (response.status == 200) {
 				let movedTask = null
-				setBoardData(prevBoardData => {
-					const newBoardData = prevBoardData.map(list => {
-						if (list.id === listOrigin) {
-							const tasksInOrigin = list.tasks
-							const taskIndex = tasksInOrigin.findIndex(task => task.id === taskId)
+				let movedData = boardData.map(list => {
+					if (list.id === listOrigin) {
+						const tasksInOrigin = list.tasks
+						const taskIndex = tasksInOrigin.findIndex(task => task.id === taskId)
 
-							// Task is found, save the task with the destination list id
-							if (taskIndex > -1) {
-								movedTask = { ...tasksInOrigin[taskIndex], list_id: listDestination }
-								return {
-									...list,
-									tasks: [
-										...tasksInOrigin.slice(0, taskIndex),
-										...tasksInOrigin.slice(taskIndex + 1)
-									]
-								}
+						// Task is found, save the task with the destination list id
+						if (taskIndex > -1) {
+							movedTask = { ...tasksInOrigin[taskIndex], list_id: listDestination }
+							return {
+								...list,
+								tasks: [
+									...tasksInOrigin.slice(0, taskIndex),
+									...tasksInOrigin.slice(taskIndex + 1)
+								]
 							}
+						}
+					}
+					return list
+				})
+
+				if (movedTask) {
+					movedData = movedData.map(list => {
+						// Add task in new list
+						if (list.id === listDestination) {
+							return { ...list, tasks: [...list.tasks, movedTask] }
 						}
 						return list
 					})
+				}
 
-					if (movedTask) {
-						return newBoardData.map(list => {
-							// Add task in new list
-							if (list.id === listDestination) {
-								return { ...list, tasks: [...list.tasks, movedTask] }
-							}
-							return list
-						})
-					}
+				setBoardData(movedData)
+				setFilteredBoardData(movedData)
+				// When modifying the board data, we also need to apply the current filters
+				applyFilters(filterName, filterSeverity, movedData)
 
-					return newBoardData
-				})
-				
 				return true
 			}
 			else {
@@ -168,8 +182,12 @@ export default function ReportBoard() {
 					"title": newListName,
 					"tasks": []
 				}
+				const afterCreate = [...boardData, newList]
 
-				setBoardData(prevBoardData => [...prevBoardData, newList])
+				setBoardData(afterCreate)
+				setFilteredBoardData(afterCreate)
+				// When modifying the board data, we also need to apply the current filters
+				applyFilters(filterName, filterSeverity, afterCreate)
 				setCreateListOpen(false)
 			}
 			else {
@@ -194,6 +212,39 @@ export default function ReportBoard() {
 		setListInfo(listInfo)
 	}
 
+	const applyFilters = (nameData, severityData, data) => {
+		let newBoardData = [...data]
+
+		if (nameData !== "") {
+			newBoardData = newBoardData.map(list => {
+				return {
+					...list,
+					tasks: list.tasks.filter(task => task.title.toLowerCase().includes(nameData))
+				}
+			})
+		}
+		
+		if (severityData !== "") {
+			newBoardData = newBoardData.map(list => {
+				return {
+					...list,
+					tasks: list.tasks.filter(task => task.severity.toLowerCase() === severityData)
+				}
+			})
+		}
+
+		setFilteredBoardData(newBoardData)
+	}
+
+	const handleFilter = (type, value) => {
+		if (type === "name") setFilterName(value.toLowerCase())
+		if (type === "severity") setFilterSeverity(value.toLowerCase())
+		
+		const nameData = type === "name" ? value.toLowerCase() : filterName.toLowerCase()
+		const severityData = type === "severity" ? value.toLowerCase() : filterSeverity.toLowerCase()
+		applyFilters(nameData, severityData, boardData)
+	}
+
 	return (
 		<div className="page page-board">
 			<div className="container">
@@ -215,13 +266,13 @@ export default function ReportBoard() {
 									<span className="chip-text"><strong>Informe ID:</strong> {reportId}</span>
 								</div>
 							</div>
-							<div className="">
-								<button className="button">Test</button>
-							</div>
 						</div>
+						<BoardFilter
+							onFilter={handleFilter}
+						/>
 					</section>
 					<section className="board-lists">
-						{boardData.map((list, index) => (
+						{filteredBoardData.map((list, index) => (
 							<BoardList
 								key={index}
 								list={list}

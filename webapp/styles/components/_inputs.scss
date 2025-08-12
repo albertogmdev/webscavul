@@ -1,0 +1,16 @@
+@use '../abstracts' as *;
+
+input[type="text"],
+textarea,
+select {
+    font-size: 14px;
+    border: none;
+    outline: none;
+    border-bottom: 2px solid $secondaryBorder;
+    background-color: $tertiaryBg;
+    padding: 8px 12px;
+}
+
+select {
+    padding: 7px 12px;
+}

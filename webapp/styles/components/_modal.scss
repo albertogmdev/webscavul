@@ -55,15 +55,6 @@
         }
     }
 
-    input[type="text"],
-    textarea {
-        border: none;
-        outline: none;
-        border-bottom: 2px solid $secondaryBorder;
-        background-color: $tertiaryBg;
-        padding: 8px 12px;
-    }
-
     &.modal-task {
         .modal-body {
             max-height: none;
