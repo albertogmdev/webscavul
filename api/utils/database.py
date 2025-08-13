@@ -5,6 +5,7 @@ import json
 import time
 import hashlib
 import datetime
+import html
 
 from mariadb import ConnectionPool
 from dotenv import load_dotenv
@@ -15,7 +16,7 @@ report_json_fields = ["ip", "ssl_info", "hsts", "csp", "xframe", "content_type",
 
 list_fields = ["id", "report_id", "title"]
 
-task_fields = ["id", "list_id", "title", "type", "severity", "location", "details", "status", "archived"]
+task_fields = ["id", "list_id", "title", "type", "severity", "location", "code", "details", "status", "archived"]
 
 # Create a db connection pool
 def create_db_pool(threads: int) -> ConnectionPool:
@@ -89,16 +90,18 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
 
         # Create al tasks
         tasks_sql = "INSERT INTO Task \
-            (list_id, title, type, severity, location, details, status, archived) \
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            (list_id, title, type, severity, location, code, details, status, archived) \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         tasks_data = []
         for vulnerability in vulnerabilities:
+            escaped_code = html.escape(vulnerability.code) if vulnerability.code else ""
             tasks_data.append((
                 list_id,
                 vulnerability.name,
                 vulnerability.type,
                 vulnerability.severity,
                 vulnerability.location,
+                escaped_code,
                 vulnerability.details,
                 0,
                 False,
@@ -166,8 +169,8 @@ def get_report_board(db_connection, report_id):
                 task_list.append(task)
 
             list["tasks"] = task_list
+            print(task_list)
             board.append(list)
-        
         cursor.close()
         return board if len(board) > 0 else None
     except Exception as e:

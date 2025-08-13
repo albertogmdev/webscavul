@@ -309,7 +309,7 @@ export default function ReportBoard() {
 									<div className="info-item info-critical">
 										<span className="info-text">Tareas críticas: </span>
 										<span className="info-count">
-											{boardData.reduce((acc, list) => acc + list.tasks.filter(task => task.severity.toLowerCase() === "high").length, 0)}
+											{boardData.reduce((acc, list) => acc + list.tasks.filter(task => task.severity && task.severity.toLowerCase() === "high").length, 0)}
 										</span>
 									</div>
 								</div>
@@ -318,13 +318,13 @@ export default function ReportBoard() {
 										href={`/report/${reportId}`} 
 										className="button button-primary"
 									>
-										Ver información general
+										Ver informe
 									</Link>
 									<Link 
-										href="/"
+										href="/reports"
 										className="button button-secondary"
 									>
-										Ver mis informes
+										Mis informes
 									</Link>
 								</div>
 							</div>

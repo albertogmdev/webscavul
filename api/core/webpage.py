@@ -78,7 +78,7 @@ class MetaTag:
         self.code = code
 
 class Form:
-    def __init__(self, id: str, classname: list[str], action: str, method: str):
+    def __init__(self, id: str, classname: list[str], action: str, method: str, code: str):
         self.id = id
         self.classname = classname
         self.action = action
@@ -88,6 +88,7 @@ class Form:
         self.fields_count = {"total": 0}
         self.has_csrf = False
         self.has_captcha = False
+        self.code = code
 
     def add_field(self, field):
         # Count fields types in a form
@@ -181,10 +182,11 @@ class LinkTag:
         self.code = code
     
 class Vulnerability:
-    def __init__(self, name: str, type: str, severity: str, location: str, details: str, payload: str = ""):
+    def __init__(self, name: str, type: str, severity: str, location: str, details: str, code: str = "", payload: str = ""):
         self.name = name
         self.type = type
         self.severity = severity
         self.location = location
+        self.code = code if code is not None else ""
         self.details = details
         self.payload = payload

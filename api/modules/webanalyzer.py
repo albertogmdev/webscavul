@@ -98,6 +98,7 @@ def analyze_script_tags(webpage: WebPage):
                 type="Script",
                 severity="Low",
                 location=script.src,
+                code=script.code,
                 details="El script apunta a un recurso externo utilizando HTTP en lugar de HTTPS.",
             ))
         # Script con SRI configurado de forma incorrecta
@@ -112,6 +113,7 @@ def analyze_script_tags(webpage: WebPage):
                     type="Script",
                     severity="Medium",
                     location=script.src,
+                    code=script.code,
                     details="El script no tiene los atributos 'crossorigin' e 'integrity', lo que puede permitir ataques de inyección.",
                 ))
 
