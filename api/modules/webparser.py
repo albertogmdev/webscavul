@@ -41,7 +41,6 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
         form_action = form.get('action')
 
         formObject = Form(form_id, form_class, form_action, form_method, str(form))
-
         parse_fields(form, formObject)
         form_type = determine_formtype(formObject, form, webpage.url)
 
@@ -187,13 +186,14 @@ def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
         if element and element.text and element.text != "":
             formatted_text = utils.remove_accents(element.text.lower().strip().replace(" ", ""))
             form_texts.append(formatted_text)
+
     for element in form_element.find_all('div'):
         has_child_tags = any(isinstance(child, Tag) for child in element.children)
         has_text = element.text.strip() != ""
         if not has_child_tags and has_text:
             formatted_text = utils.remove_accents(element.text.lower().strip().replace(" ", ""))
             form_texts.append(formatted_text)
-
+            
     for element in form_texts:
         for type, values in keywords.items():
             for keyword in values:

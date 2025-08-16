@@ -182,11 +182,11 @@ class LinkTag:
         self.code = code
     
 class Vulnerability:
-    def __init__(self, name: str, type: str, severity: str, location: str, details: str, code: str = "", payload: str = ""):
+    def __init__(self, name: str, type: str, severity: str, details: str, location: str = "", code: str = "", payload: str = ""):
         self.name = name
         self.type = type
         self.severity = severity
-        self.location = location
+        self.location = location if location is not None else ""
         self.code = code if code is not None else ""
         self.details = details
         self.payload = payload

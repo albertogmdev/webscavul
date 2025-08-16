@@ -53,7 +53,7 @@ CREATE TABLE Task (
     severity VARCHAR(50) NOT NULL,
     location VARCHAR(255),
     code TEXT,
-    details VARCHAR(255),
+    details VARCHAR(512),
     status INT NOT NULL,
     archived BOOLEAN NOT NULL,
     FOREIGN KEY (list_id) REFERENCES List(id)

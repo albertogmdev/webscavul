@@ -31,7 +31,8 @@ def analyze_forms(webpage: WebPage):
                 type="Form",
                 severity=severity,
                 location=form.id,
-                details="",
+                code=form.code,
+                details="El formulario no tiene implementado el token CSRF, esto puede ocasionar o facilitar los ataques de secuestro de sesión. Se recomienda la implementación de este token en formularios críticos (inicio de sesión, creación de cuentas...)",
             ))
         
         # Action with HTTP url
@@ -40,8 +41,9 @@ def analyze_forms(webpage: WebPage):
                 name="Form con atributo 'action' externo inseguro (HTTP)",
                 type="Form",
                 severity="High",
-                location=form.action,
-                details="",
+                location=f"{form.id} action: [${form.action}]",
+                code=form.code,
+                details="El formulario tiene implementado el atributo 'action' con una URL que referencia a un posible sitio externo malicioso o inseguro, debido a que este implementa HTTPS. ",
             ))
 
         # Form with sensitive data without proper method 
@@ -50,8 +52,9 @@ def analyze_forms(webpage: WebPage):
                 name="Formulario con datos confidenciales expuestos (GET)",
                 type="Form",
                 severity="High",
-                location=form.method,
-                details="",
+                location=f"{form.id} method: [${form.method}]",
+                code=form.code,
+                details="El formulario procesa datos confidenciales, como contraseñas, implementando un método que no guarda la confidencialidad de los datos (GET). El método GET expone de texto claro los datos del formulario, quedando estos expuestos a terceros.",
             ))
         
         # Form without action atribute
@@ -61,6 +64,7 @@ def analyze_forms(webpage: WebPage):
                 type="Form",
                 severity="Information",
                 location=form.id,
+                code=form.code,
                 details="Se recomienda especificar explícitamente el valor del atributo 'action' para mejorar la claridad del código, la mantenibilidad y evitar posibles confusiones. El formulario enviará los datos a la misma URL de la página."
             ))
 
@@ -75,7 +79,8 @@ def analyze_forms(webpage: WebPage):
                         type="Form",
                         severity="Medium",
                         location=form.id,
-                        details=""
+                        code=form.code,
+                        details="El formulario contiene un campo de contraseña que no utiliza el tipo de input adecuado (password). Esto puede exponer la contraseña en texto plano al escribirla, facilitando que sea visible para terceros. Se recomienda establecer el tipo password para proteger la confidencialidad del dato."
                     ))
                     if not form.method or form.method.lower() == 'get' or form.method == '':
                         webpage.add_vulnerability(Vulnerability(
@@ -83,9 +88,9 @@ def analyze_forms(webpage: WebPage):
                             type="Form",
                             severity="High",
                             location=form.id,
-                            details="",
+                            code=form.code,
+                            details="El formulario procesa datos confidenciales, como contraseñas, implementando un método que no guarda la confidencialidad de los datos (GET). El método GET expone de texto claro los datos del formulario, quedando estos expuestos a terceros.",
                         ))
-
 
 def analyze_script_tags(webpage: WebPage):
     print("INFO: Analyzing script tags in the webpage")
@@ -99,7 +104,7 @@ def analyze_script_tags(webpage: WebPage):
                 severity="Low",
                 location=script.src,
                 code=script.code,
-                details="El script apunta a un recurso externo utilizando HTTP en lugar de HTTPS.",
+                details="El script apunta a un recurso externo utilizando HTTP en lugar de HTTPS, lo que puede indicar que el recurso pertenece a un sitio inseguro o malicioso. Esto puede permitir ataques de phishing o inyección de código malicioso. Si este sitio no es conocido, se recomienda utilizar HTTPS para todos los recursos externos de la página web.",
             ))
         # Script con SRI configurado de forma incorrecta
         sri_value = ""
@@ -114,7 +119,7 @@ def analyze_script_tags(webpage: WebPage):
                     severity="Medium",
                     location=script.src,
                     code=script.code,
-                    details="El script no tiene los atributos 'crossorigin' e 'integrity', lo que puede permitir ataques de inyección.",
+                    details="El script externo no cuenta con los atributos integrity y/o crossorigin configurados correctamente. Esto impide verificar que el archivo no ha sido alterado, lo que puede facilitar la inyección de código malicioso. Se recomienda habilitarlos para garantizar la integridad y seguridad del recurso.",
                 ))
 
 def analyze_link_tags(webpage: WebPage):
@@ -129,8 +134,9 @@ def analyze_link_tags(webpage: WebPage):
                     name="Link externo inseguro (HTTP)",
                     type="Link",
                     severity="Low",
-                    location=f"{link.code}",
-                    details="Link tag apunta a un recurso externo utilizando HTTP en lugar de HTTPS.",
+                    location=link.href,
+                    code=link.code,
+                    details="La etiqueta <link> apunta a un recurso externo utilizando HTTP en lugar de HTTPS.",
                 )
             )
         # Link con SRI configurado de forma incorrecta
@@ -144,9 +150,10 @@ def analyze_link_tags(webpage: WebPage):
                     Vulnerability(
                         name=f"Link {sri_value}",
                         type="Link",
-                        severity="Medium",
-                        location=f"{link.code}",
-                        details="Link tag no tiene los atributos 'crossorigin' e 'integrity', lo que puede permitir ataques de inyección.",
+                        severity="Low",
+                        location=link.href,
+                        code=link.code,
+                        details="La etiqueta <link> no cuenta con los atributos integrity y/o crossorigin configurados correctamente. Esto impide verificar que el archivo no ha sido alterado, lo que puede facilitar la inyección de código malicioso. Se recomienda habilitarlos para garantizar la integridad y seguridad del recurso.",
                     )
                 )
         # Link con atributes deprecated
@@ -160,8 +167,9 @@ def analyze_link_tags(webpage: WebPage):
                         name=f"Link con atributos {separator.join(attributes)} deprecados",
                         type="Link",
                         severity="Medium",
-                        location=f"{link.code}",
-                        details=f"Link tag contiene los atributos deprecated {separator.join(attributes)}.",
+                        location={separator.join(attributes)},
+                        code=link.code,
+                        details=f"La etiqueta <link> usa los atributos {separator.join(attributes)} que ya no son recomendados por los estándares web. Aunque no representan un riesgo directo de seguridad, pueden afectar la compatibilidad y funcionamiento de la página en el futuro. Se recomienda actualizarlos siguiendo las especificaciones actuales de HTML.",
                     )
                 )
 
@@ -176,10 +184,9 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                 name="Meta tag CSP no configurada",
                 type="Meta",
                 severity="High",
-                location="Content-Security-Policy",
-                details="La página no tiene configurada la meta tag 'Content-Security-Policy'.",
+                details="La página no cuenta con una política de seguridad de contenidos (CSP). Este mecanismo ayuda a prevenir ataques como la inyección de scripts maliciosos (XSS) controlando qué recursos se pueden cargar. Se recomienda definir una CSP adecuada para reforzar la seguridad del sitio.",
             ))
-    
+
     # Refresh meta tag / header
     meta_refresh = None
     is_header = False
@@ -203,7 +210,8 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                         type=f"{'Meta' if is_header else 'Header'}",
                         severity="High",
                         location=url,
-                        details="La cabecera 'Refresh' redirige a un recurso externo utilizando HTTP en lugar de HTTPS. Esto puede permitir ataques de phishing a dominios inseguros.",
+                        code=meta_refresh,
+                        details="La cabecera 'Refresh' redirige a un recurso o sitio externo inseguro o malicioso utilizando HTTP en lugar de HTTPS. Esto puede permitir ataques de phishing a dominios inseguros. Si el recurso no es conocido, se recomienda utilizar HTTPS para todos los recursos externos de la página web.",
                     ))
                 elif url:
                     webpage.add_vulnerability(Vulnerability(
@@ -211,7 +219,8 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                         type=f"{'Meta' if is_header else 'Header'}",
                         severity="Information",
                         location=url,
-                        details="El uso de la cabecera 'Refresh' puede ser problemático, ya que puede permitir ataques de phishing.",
+                        code=meta_refresh,
+                        details="La cabecera o meta tag Refresh está activa. Aunque no siempre es peligrosa, puede ser usada para redirigir de forma automática a páginas maliciosas. Se recomienda evitar su uso y, en su lugar, gestionar las redirecciones desde el servidor de manera controlada.",
                     ))
     
     # Charset meta tag
@@ -222,8 +231,8 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                 name="Meta tag charset no configurada",
                 type="Meta",
                 severity="Medium",
-                location="",
-                details="La página no tiene configurada la meta tag 'charset'. Esto puede causar problemas de codificación y vulnerabilidades de seguridad.",
+                location="charset",
+                details="La página no tiene configurada la meta tag 'charset'. Esto puede causar problemas de codificación y vulnerabilidades de seguridad. Se recomienda establecerla explícitamente en utf-8 para garantizar una correcta interpretación de los caracteres.",
             )
         )
     elif meta_charset.charset.lower() != "utf-8":
@@ -233,7 +242,8 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                 type="Meta",
                 severity="Information",
                 location=meta_charset.charset,
-                details="La meta tag 'charset' no está configurada como 'utf-8'. Este formato es recomendado y ampliamente utilizado para evitar problemas de codificación.",
+                code=meta_charset.code,
+                details="La meta tag 'charset' está configurada con un valor diferente a 'utf-8'. Este formato es recomendado y ampliamente utilizado para evitar problemas de codificación.",
             )
         )
     
@@ -245,7 +255,7 @@ def analyze_metatags(webpage: WebPage, headers: dict):
             type="Meta",
             severity="Information",
             location="robots",
-            details="La página no tiene configurada la meta tag 'robots'. Especificarlo otorga un mayor control sobre la indexación de las páginas.",
+            details="La página no tiene configurada la meta tag 'robots'. Este atributo permite controlar como los motores de búsqueda indexan las rutas de la página web. Se recomienda establecerla para evitar que se indexen rutas sensibles o privadas.",
         ))
    
     meta_referrer = None
@@ -262,16 +272,15 @@ def analyze_metatags(webpage: WebPage, headers: dict):
             name="Meta tag / Header referrer no configurado",
             type="Meta",
             severity="Medium",
-            location="",
-            details="Referrer no está configurado, lo que puede provocar que el navegador establezca un valor de referrer inseguro.",
+            location="referrer",
+            details="La cabecera o meta tag referrer no está configurada. Esto puede provocar que el navegador envíe información sensible de la URL al sitio de destino, exponiendo datos a terceros. Se recomienda definir un valor seguro para limitar la información compartida.",
         ))
     elif meta_referrer and meta_referrer.lower() not in ['no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade', 'strict-origin']:
         webpage.add_vulnerability(Vulnerability(
             name=f"{'Meta tag' if is_header else 'Header'} referrer con valor no recomendado",
             type=f"{'Meta' if is_header else 'Header'}",
             severity="Medium",
-            location=meta_referrer,
-            details="El valor de 'referrer' no es recomendado. Se recomienda utilizar valores como 'no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade' o 'strict-origin'.",
+            details="La cabecera o meta tag referrer utiliza un valor no recomendado. Esto puede permitir la filtración innecesaria de datos a otros sitios. Se recomienda utilizar valores seguros como 'no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade' o 'strict-origin'.",
         ))
 
     # generator meta tag
@@ -282,7 +291,8 @@ def analyze_metatags(webpage: WebPage, headers: dict):
             type="Meta",
             severity="Information",
             location=meta_generator.content,
-            details="La meta tag 'generator' puede revelar información sobre el CMS o framework utilizado, lo que podría ser útil para un atacante.",
+            code=meta_generator.code,
+            details="La meta tag 'generator' puede revelar información sobre el CMS o framework utilizado, lo que podría ser útil y dar información relevante al atacante para un atacante.",
         ))
 
 def analyze_links(webpage: WebPage):
@@ -296,8 +306,10 @@ def analyze_links(webpage: WebPage):
                 type="Enlace",
                 severity="Low",
                 location=link.href,
-                details="El enlace apunta a un recurso externo utilizando HTTP en lugar de HTTPS.",
+                code=link.code,
+                details="El enlace apunta a un recurso externo utilizando HTTP en lugar de HTTPS, lo que puede indicar que el recurso pertenece a un sitio inseguro o malicioso. Esto puede permitir que los usuarios accedan a páginas con ataques de phishing o inyección de código malicioso. Si este sitio no es conocido, se recomienda utilizar HTTPS para todos los recursos externos de la página web.",
             ))
+
         # Link con target _blank sin rel="noopener noreferrer"
         rel_value = ""
         if link.blank and link.href is not None and link.href != "" and link.external:
@@ -311,5 +323,6 @@ def analyze_links(webpage: WebPage):
                     type="Enlace",
                     severity="Medium",
                     location=link.href,
-                    details="El enlace tiene un target '_blank' sin el atributo 'rel' adecuado, lo que puede permitir ataques de phishing.",
+                    code=link.code,
+                    details="El enlace tiene un target '_blank' sin el atributo 'rel' recomendado, Esto puede permitir que la página abierta manipule la original, facilitando ataques de phishing o robo de información. Se aconseja añadir rel="'oopener noreferrer'" para mitigar este riesgo.",
                 ))

@@ -72,7 +72,6 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         report_port = session.port if session.port else 0
 
         # Insert report info
-        print(ssl)
         report_sql = "INSERT INTO Report \
             (id, title, domain, full_domain, protocol, ip, vulnerabilities, port, ssl_info, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -111,11 +110,11 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         db_connection.commit()
         cursor.close()
     except mariadb.Error as e:
-        print(f"ERROR: {e}")
+        print(f"ERROR: AAAA{e}")
         db_connection.rollback()
         return {"status": 500, "error": e}
     except Exception as e:
-        print(f"ERROR: {e}")
+        print(f"ERROR: BBB{e}")
         db_connection.rollback()
         return {"status": 500, "error": e}
     
