@@ -1,0 +1,28 @@
+@use '../abstracts' as *;
+
+.scanner-card {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    margin-top: 100px;
+    background-color: $cardBg;
+    border: 1px solid $primaryBorder;
+    border-radius: $radius;
+    padding: 40px 24px;
+
+    .scanner-config {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid $secondaryBorder;
+        
+        .config-title {
+            font-size: 16px;
+            margin-bottom: 10px;    
+            color: $secondaryText;
+        }
+    }
+
+    .scanner-others {
+
+    }
+}

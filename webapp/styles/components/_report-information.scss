@@ -1,0 +1,48 @@
+@use '../abstracts' as *;
+
+.report-information {
+    margin-bottom: 24px;
+
+    .information-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+
+        .content-col {
+            width: calc(100% / 2 - 12px);
+
+            .info-table {
+                border: 1px solid $primaryBorder;
+
+                .table-header {
+                    font-size: 18px;
+                    color: $primaryText;
+                    padding: 8px 16px;
+                    border-bottom: 1px solid $primaryBorder;
+                    background-color: $cardSecondaryBg;
+                }
+
+                .table-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px 16px;
+                    border-bottom: 1px solid $primaryBorder;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    .value {
+                        width: 0;
+                        flex: 1 0;
+                        font-size: 14px;
+                        padding-left: 30px;
+                        word-wrap: break-word;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+}
