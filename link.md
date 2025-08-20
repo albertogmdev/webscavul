@@ -4,6 +4,8 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Pol
 https://web.dev/articles/referrer-best-practices?hl=es
 ## Refresh
 https://unit42.paloaltonetworks.com/rare-phishing-page-delivery-header-refresh/
+## Cache control
+https://simonhearne.com/2022/caching-header-best-practices/
 
 # ANALISIS SINTACTICO DE LA WEB
 https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/script
