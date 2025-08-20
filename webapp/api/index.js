@@ -57,6 +57,17 @@ export const createReport = async (scanDomain) => {
     }
 }   
 
+export const getAllReports = async () => {
+    try {
+        const endpoint = `/report/${reportId}`
+        const response = await fetchData(endpoint)
+        return response
+    } catch (error) {
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+}   
+
 export const getReport = async (reportId) => {
     try {
         const endpoint = `/report/${reportId}`

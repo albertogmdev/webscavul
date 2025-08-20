@@ -120,6 +120,32 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
     
     return {"status": 200, "data": {"report_id": report_id}}
 
+def get_all_reports(db_connection):
+    try: 
+        cursor = db_connection.cursor()
+        
+        sql = "SELECT * FROM Report"
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        reports = []
+
+        for row in rows:
+            report = dict(zip(report_fields, row))
+            for json_field in report_json_fields:
+                value = report.get(json_field)
+                if value and isinstance(value, str):
+                    # Try to parse a string field if it is JSON
+                    try: report[json_field] = json.loads(value)
+                    except json.JSONDecodeError: pass
+            reports.append(report)
+        
+        cursor.close()
+        return reports if len(reports) > 0 else None
+    except Exception as e:
+        cursor.close()
+        return None
+        
+
 def get_report_by_id(db_connection, report_id):
     try: 
         cursor = db_connection.cursor()
@@ -134,6 +160,7 @@ def get_report_by_id(db_connection, report_id):
             for json_field in report_json_fields:
                 value = report.get(json_field)
                 if value and isinstance(value, str):
+                    # Try to parse a string field if it is JSON
                     try: report[json_field] = json.loads(value)
                     except json.JSONDecodeError: pass
 
@@ -168,7 +195,6 @@ def get_report_board(db_connection, report_id):
                 task_list.append(task)
 
             list["tasks"] = task_list
-            print(task_list)
             board.append(list)
         cursor.close()
         return board if len(board) > 0 else None
