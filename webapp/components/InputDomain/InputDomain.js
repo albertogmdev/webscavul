@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function InputURL({onSubmitScan}) {
+export default function InputDomain({onSubmitScan}) {
 	const [domain, setDomain] = useState('');
 
 	const handleSubmit = (event) => {
@@ -12,19 +12,22 @@ export default function InputURL({onSubmitScan}) {
 
     const handleChange = (event) => { setDomain(event.target.value) }
 
-	return (
+	return (<>
+		<p className="input-label" htmlFor="domain">Introduce la URL de la web</p>
 		<form className="input-domain" onSubmit={handleSubmit}>
-            <input 
+			<input 
+				id="domain"
 				onChange={handleChange}
-				className="input-text text-md"
+				className="input-text"
 				type="text"
+				placeholder="https://example.com o example.com"
 			/>
-            <button 
-				className="input-submit"
+			<button 
+				className="input-submit button button-primary"
 				type="submit"
 			>
 				Escanear
 			</button>
 		</form>
-	)
+	</>)
 }

@@ -1,26 +1,32 @@
 @use '../abstracts' as *;
 
-.input-domain{
+.input-label {
+    font-size: 16px;
+    color: $secondaryText;
+    margin-bottom: 10px;
+}
+
+.input-domain {
     display: flex;
     width: 100%;
-    align-items: stretch;
+    align-items: center;
     margin: 0 auto;
+    gap: 10px;
 
     .input-text {
         width: 0;
         flex: 1 0;
         padding: 10px;
         border: none;
-        background-color: grey;
-        border: 1px solid white;
-    }
+        background-color: $tertiaryBg;
+        border-radius: $radius;
+        color: $primaryText;
+        font-size: 16px;
+        transition: outline 0.3s ease;
 
-    .input-submit {
-        font-size: 18px;
-        width: 130px;
-        text-align: center;
-        padding: 16px 0px;
-        color: black;
-        background-color: white;
+        &:focus {
+            outline: 2px solid $primaryAccent;
+            outline-offset: 2px;
+        }
     }
 }

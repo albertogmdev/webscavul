@@ -6,7 +6,10 @@
 @use "base/typography";
 @use "base/icons";
 
+@use "components/scanner-card";
 @use "components/input-domain";
+@use "components/report-headers";
+@use "components/report-information";
 @use "components/card";
 @use "components/button";
 @use "components/modal";

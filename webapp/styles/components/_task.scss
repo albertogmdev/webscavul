@@ -31,3 +31,103 @@
     }
 
 }
+
+.modal-task {
+    .modal-body {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .task-tags {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+
+        .actions-menu {
+            position: absolute;
+            right: 30px;
+            top: -9px;
+        }
+
+        .tags-info {
+            width: 0;
+            flex: 1 0;
+
+            .tag-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 16px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                p {
+                    font-size: 14px;
+                    color: $secondaryText;
+                }
+            }
+        }
+    }
+
+    .task-content {
+        max-height: 50dvh;
+        overflow-y: auto;
+        margin-top: 10px;
+
+        .content-title {
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: $primaryText;
+        }
+
+        .task-details,
+        .task-comments {
+            .content-info {
+                font-size: 14px;
+                color: $secondaryText;
+            }
+        }
+
+        .task-location,
+        .task-code {
+            margin-top: 20px;
+
+            .content-info {
+                font-family: monospace;
+                font-size: 13px;
+                padding: 8px;
+                border-radius: 8px;
+                word-wrap: break-word;
+                background-color: $cardSecondaryBg;
+                overflow-x: scroll;
+            }
+        }
+
+        .task-code {
+            .content-info {
+                pre {
+                    margin: 0;
+                    font-family: monospace;
+                    font-size: 13px;
+                }
+            }
+        }
+
+        .task-comments {
+            .comment-form {
+                margin-top: 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+
+                button {
+                    align-self: flex-end;
+                }
+            }
+        }
+    }
+}

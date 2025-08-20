@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, use } from "react"
+import Code from "@components/Code/Code"
 import Modal from "@components/Modal/Modal"
 import TaskTag from "@components/TaskTag/TaskTag"
 
@@ -98,10 +99,20 @@ export default function Task({task, listId, lists, onDeleteTask, onTaskMove}) {
                             {task.details || "No se han especificado detalles."}
                         </div>
                     </div>
+                    {task.location && (
                     <div className="task-location">
                         <p className="content-title">Ubicación</p>
                         <div className="content-info">{task.location}</div>
                     </div>
+                    )}
+                    {task.code && (
+                    <div className="task-code">
+                        <p className="content-title">Código</p>
+                        <div className="content-info">
+                            <Code html={task.code} />
+                        </div>
+                    </div>
+                    )}
                     <div className="task-comments">
                         <p className="content-title">Comentario</p>
                         <div className="content-info">{task.comments || "No se ha añadido ningún comentario."}</div>

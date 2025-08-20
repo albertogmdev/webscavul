@@ -1,12 +1,47 @@
 @use '../abstracts' as *;
 
 #header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: $navbarHeight;
+    padding: 24px;
     background-color: $primaryBg;
     border-bottom: 1px solid $primaryBorder;
     z-index: 1;
+
+    .header-logo {
+        .icon {
+            aspect-ratio: 23 / 5;
+            height: 40px;
+            width: auto;
+            background-color: $primaryText;
+            transition: all 0.3s ease;
+        }
+
+
+        &:hover {
+            .icon {
+                background-color: $primaryAccent;
+            }
+        }
+    }
+
+    .header-links {
+        display: flex;
+        gap: 16px;
+
+        .header-link {
+            color: $secondaryText;
+            text-decoration: none;
+            transition: all 0.3s ease;
+
+            &:hover {
+                color: $primaryAccent;
+            }
+        }
+    }
 }

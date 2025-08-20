@@ -4,6 +4,10 @@
     display: block;
 }
 
+.icon-webscavul {
+    @include mask-icon(url("#{$base-url}/img/icon-webscavul.svg"));
+}
+
 .icon-arrowup {
     @include mask-icon(url("#{$base-url}/img/icon-arrowup.svg"));
 }
