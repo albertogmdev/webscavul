@@ -26,10 +26,17 @@ export default function ReportBoard() {
 		const getBoardInfo = async () => {
 			try {
 				const response = await getReportBoard(reportId)
-				const board = response.data.board
 
-				setBoardData(board)
-				setFilteredBoardData(board)
+				if (response.status == 200) {
+					const board = response.data.board
+
+					setBoardData(board)
+					setFilteredBoardData(board)
+				}
+				else {
+					console.error("Error fetching report " + reportId)
+					setError(`Error al cargar el informe ${reportId} o informe no existente.`)
+				}
 			} catch (err) {
 				console.error("Error fetching report:", err)
 				setError(err.message)
@@ -54,7 +61,7 @@ export default function ReportBoard() {
 
 			if (response.status == 200) {
 				const afterDelete = boardData.filter((list) => list.id != listId)
-				
+
 				setBoardData(afterDelete)
 				setFilteredBoardData(afterDelete)
 				// When modifying the board data, we also need to apply the current filters
@@ -255,7 +262,7 @@ export default function ReportBoard() {
 				}
 			})
 		}
-		
+
 		if (severityData !== "") {
 			newBoardData = newBoardData.map(list => {
 				return {
@@ -271,7 +278,7 @@ export default function ReportBoard() {
 	const handleFilter = (type, value) => {
 		if (type === "name") setFilterName(value.toLowerCase())
 		if (type === "severity") setFilterSeverity(value.toLowerCase())
-		
+
 		const nameData = type === "name" ? value.toLowerCase() : filterName.toLowerCase()
 		const severityData = type === "severity" ? value.toLowerCase() : filterSeverity.toLowerCase()
 		applyFilters(nameData, severityData, boardData)
@@ -314,13 +321,13 @@ export default function ReportBoard() {
 									</div>
 								</div>
 								<div className="content-buttons">
-									<Link 
-										href={`/report/${reportId}`} 
+									<Link
+										href={`/report/${reportId}`}
 										className="button button-primary"
 									>
 										Ver informe
 									</Link>
-									<Link 
+									<Link
 										href="/reports"
 										className="button button-secondary"
 									>

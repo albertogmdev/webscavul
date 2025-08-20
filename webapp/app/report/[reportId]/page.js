@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { getReport } from '@/api'
 import Link from 'next/link'
+import ReportInformation from '@/components/ReportInformation/ReportInformation'
+import ReportHeaders from '@/components/ReportHeaders/ReportHeaders'
 
 
 export default function ReportDetail() {
@@ -48,10 +50,6 @@ export default function ReportDetail() {
 				"Versión TLS": sslInfo.tls_version,
 				"Cifrado TLS": sslInfo.tls_cipher,
 			})
-		}
-
-		const processGeneralInfo = (generalInfo) => {
-
 		}
 
 		const getReportDetail = async () => {
@@ -112,11 +110,11 @@ export default function ReportDetail() {
 								</li>
 								<li className="info-item">
 									<p className="label stext">Dirección IP</p>
-									<p className="value ptext">192.168.0.0</p>
+									<p className="value ptext">#####TODO</p>
 								</li>
 								<li className="info-item">
 									<p className="label stext">Fecha</p>
-									<p className="value ptext">{reportData.date}</p>
+									<p className="value ptext">#####TODO{reportData.date}</p>
 								</li>
 							</ul>
 							<div className="card-buttons">
@@ -163,89 +161,13 @@ export default function ReportDetail() {
 							</li>
 						</ul>
 					</section>
-					<section className="report-information">
-						<div className="card">
-							<h2 className="card-title">Información general y certificado SSL</h2>
-							<div className="information-content">
-								<div className="content-col general-info">
-									<ul className="info-table">
-										<h3 className="table-header">Información general</h3>
-										<li className="table-item">
-											<h4 className="label stext">Dominio</h4>
-											<p className="value ptext">{reportData.domain}</p>
-										</li>
-										<li className="table-item">
-											<h4 className="label stext">URL</h4>
-											<p className="value ptext">{reportData.full_domain}</p>
-										</li>
-										<li className="table-item">
-											<h4 className="label stext">Dirección IP</h4>
-											<p className="value ptext">{reportData.ip}</p>
-										</li>
-										<li className="table-item">
-											<h4 className="label stext">Protocolo</h4>
-											<p className="value ptext">{reportData.protocol}</p>
-										</li>
-									</ul>
-								</div>
-								<div className="content-col ssl-info">
-									{sslData ? (
-										<ul className="info-table">
-											<h3 className="table-header">SSL y TLS</h3>
-											{sslData && Object.entries(sslData).map(([key, value]) => (
-												<li key={key} className="table-item">
-													<h4 className="label stext">{key}</h4>
-													<p className="value ptext">{value}</p>
-												</li>
-											))}
-										</ul>
-									) : (
-										<div className="ssl-error">
-											<p className="error-text">No se pudo obtener información del certificado SSL.</p>
-											<p className="error-details">Asegúrate de que el sitio web tenga un certificado SSL válido.</p>
-										</div>
-									)}
-								</div>
-							</div>
-						</div>
-					</section>
-					<section className="report-headers">
-						<div className="card">
-							<h2 className="card-title">Análisis de cabeceras HTTP</h2>
-							<ul className="headers-list">
-								{headerData && headerData.headers && headerData.headers.length > 0 && (
-									headerData.headers.map((header, index) => (
-										<li key={index} className="header-item">
-											<div className="item-content">
-												<h3 className="item-title">{header.name}</h3>
-												<p className="item-description stext">{header.description}</p>
-												{header.value && (<div className="item-value">{[].concat(header.value).join("; ")}</div>)}
-											</div>
-											<div className="item-chip">
-												{header.correct && header.enabled ? (
-													<div className="chip chip--success">
-														<span className="chip-text">Implementado</span>
-													</div>
-												) : (header.severity === "warning" ? (
-													<div className="chip chip--warning">
-														<span className="chip-text">Warning</span>
-													</div>
-												) : (header.severity === "recommendation" || header.severity === "info" ? (
-													<div className="chip chip--info">
-														<span className="chip-text">Recomendado</span>
-													</div>
-												) : (
-													<div className="chip chip--error">
-														<span className="chip-text">Crítico</span>
-													</div>
-												)))}
-											</div>
-										</li>
-									))
-								)}
-							</ul>
-						</div>
-					</section>
+					<ReportInformation 
+						reportData={reportData} 
+						sslData={sslData} 
+					/>
+					<ReportHeaders 
+						headerData={headerData} 
+					/>
 				</>)))}
 			</div>
 		</div>
