@@ -1,0 +1,19 @@
+@use '../abstracts' as *;
+
+.page-reports_list {
+    .reports-hero {
+        margin-bottom: 48px;
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            .header-content {
+                .report-title {
+                    margin-bottom: 12px;
+                }
+            }
+        }
+    }
+}

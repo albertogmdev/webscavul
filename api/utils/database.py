@@ -140,7 +140,7 @@ def get_all_reports(db_connection):
             reports.append(report)
         
         cursor.close()
-        return reports if len(reports) > 0 else None
+        return reports
     except Exception as e:
         cursor.close()
         return None

@@ -12,6 +12,14 @@
     @include mask-icon(url("#{$base-url}/img/icon-arrowup.svg"));
 }
 
+.icon-globe {
+    @include mask-icon(url("#{$base-url}/img/icon-globe.svg"));
+}
+
+.icon-search {
+    @include mask-icon(url("#{$base-url}/img/icon-search.svg"));
+}
+
 .icon-arrowdown {
     @include mask-icon(url("#{$base-url}/img/icon-arrowdown.svg"));
 }

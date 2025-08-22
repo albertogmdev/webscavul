@@ -1,0 +1,91 @@
+@use '../abstracts' as *;
+
+.report-resume {
+    padding: 10px;
+    border: 1px solid $primaryBorder;
+    border-radius: 8px;
+    margin-bottom: 16px;
+
+    .chip {
+        align-self: flex-end;
+        max-width: 100%;
+
+        .chip-text {
+            max-width: 100%;
+        }
+    }
+
+    .resume-header {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 16px 0px;
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            padding-right: 20px;
+
+            .info-icon {
+                width: 24px;
+                height: 24px;
+                margin-right: 8px;
+                background-color: $primaryText;
+            }
+
+            .info-main {
+                flex: 1;
+            }
+
+            .report-title {
+                font-size: 16px;
+            }
+
+            .report-protocol {
+                font-size: 14px;
+                margin-top: 8px;
+                text-transform: uppercase;
+            }
+        }
+
+        .actions-menu {
+            position: absolute;
+            right: 30px;
+            top: 0px;
+        }
+    }
+
+    .resume-content {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        background-color: $cardSecondaryBg;
+        padding: 16px;
+        border-radius: 8px;
+
+        .resume-item {
+            flex: 1 1 200px;
+
+            .item-title {
+                font-size: 14px;
+                color: $secondaryText;
+                font-weight: bold;
+                margin-bottom: 8px;
+            }
+
+            .item-text {
+                font-size: 14px;
+                color: $primaryText;
+            }
+        }
+    }
+
+    .resume-buttons {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 32px;
+        gap: 16px;
+    }
+}

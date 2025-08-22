@@ -150,14 +150,6 @@ def get_report(report_id: str):
 @api.get("/reports")
 def get_all_reports():
     reports = database.get_all_reports(db_connection)
-    if not reports:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": "No se encontraron informes realizados."
-            }
-        )
 
     return {
         "status": "success", 

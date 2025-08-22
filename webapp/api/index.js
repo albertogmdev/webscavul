@@ -55,11 +55,22 @@ export const createReport = async (scanDomain) => {
         console.error(`Failed to fetch from ${endpoint}:`, error);
         throw error;
     }
-}   
+}  
+
+export const deleteReport = async (reportId) => {
+    try {
+        const endpoint = `/report/${reportId}`
+        const response = await fetchData(endpoint, {method: 'DELETE'})
+        return response
+    } catch (error) { 
+        console.error(`Failed to fetch from ${endpoint}:`, error);
+        throw error;
+    }
+}
 
 export const getAllReports = async () => {
     try {
-        const endpoint = `/report/${reportId}`
+        const endpoint = `/reports`
         const response = await fetchData(endpoint)
         return response
     } catch (error) {
