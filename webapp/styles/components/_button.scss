@@ -20,8 +20,9 @@
         opacity: 0.6;
     }
 
-    &.button--secondary {
+    &.button-secondary {
         border: 1px solid $primaryText;
+        background-color: transparent;
         color: $primaryText;
         
         &:hover {
