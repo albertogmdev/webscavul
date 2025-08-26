@@ -35,8 +35,26 @@
 
                 .item-description {
                     font-size: 14px;
-                    margin-bottom: 8px;
+                    margin-bottom: 20px;
                     color: $secondaryText;
+                }
+
+                .item-row {
+                    margin-bottom: 12px;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+
+                    .item-label {
+                        font-weight: 700;
+                        font-size: 14px;
+                        margin-bottom: 8px;
+                    }
+                }
+
+                .moreinfo-button {
+                    margin-top: 20px;
                 }
             }
 

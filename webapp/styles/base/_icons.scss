@@ -32,10 +32,6 @@
     @include mask-icon(url("#{$base-url}/img/icon-arrowleft.svg"));
 }
 
-.icon-arrowlink {
-    @include mask-icon(url("#{$base-url}/img/icon-arrowlink.svg"));
-}
-
 .icon-chevronup {
     @include mask-icon(url("#{$base-url}/img/icon-chevronup.svg"));
 }

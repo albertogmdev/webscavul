@@ -1,4 +1,5 @@
 export default function ReportHeaders({ headerData }) {
+    console.log(headerData)
     return (
         <section className="report-headers">
             <div className="card">
@@ -10,7 +11,25 @@ export default function ReportHeaders({ headerData }) {
                                 <div className="item-content">
                                     <h3 className="item-title">{header.name}</h3>
                                     <p className="item-description stext">{header.description}</p>
-                                    {header.value && (<div className="item-value">{[].concat(header.value).join("; ")}</div>)}
+                                    {header.value && (
+                                        <div className="item-row">
+                                            <p className="item-label">Valor actual</p>
+                                            <div className="item-value">{[].concat(header.value).join("; ")}</div>
+                                        </div>
+                                    )}
+                                    {header.recommendation && (
+                                        <div className="item-row">
+                                            <p className="item-label">Valor/es recomendado</p>
+                                            <div className="item-value">{header.recommendation}</div>
+                                        </div>
+                                    )}
+                                    <a 
+                                        className="moreinfo-button button button-secondary"
+                                        href={header.more} 
+                                        target="_blank" rel="noopener noreferer"
+                                    >
+                                        Más información
+                                    </a>
                                 </div>
                                 <div className="item-chip">
                                     {header.correct && header.enabled
@@ -20,7 +39,7 @@ export default function ReportHeaders({ headerData }) {
                                         </div>
                                     ) : (header.severity === "warning" ? (
                                         <div className="chip chip--warning">
-                                            <span className="chip-text">Warning</span>
+                                            <span className="chip-text">Medio</span>
                                         </div>
                                     ) : (header.severity === "recommendation" || header.severity === "info" ? (
                                         <div className="chip chip--info">
