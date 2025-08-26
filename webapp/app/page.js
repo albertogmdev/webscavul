@@ -1,5 +1,3 @@
-"use client"
-
 import ScannerCard from '@/components/ScannerCard/ScannerCard'
 
 export default function Home() {

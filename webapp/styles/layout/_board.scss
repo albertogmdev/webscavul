@@ -78,7 +78,7 @@
 
         .board-addlist {
             align-self: flex-start;
-            border: 1px dashed $primaryBorder;
+            border: 2px dashed $primaryBorder;
             text-align: center;
             padding: 40px 24px;
             border-radius: $radius;
@@ -86,7 +86,7 @@
             transition: background-color .3s ease;
 
             &:hover {
-                background-color: $secondaryBg;
+                background-color: $cardBg;
             }
         }
     }
