@@ -9,20 +9,82 @@ export default function ReportInformation({ reportData, sslData }) {
                             <h3 className="table-header">Información general</h3>
                             <li className="table-item">
                                 <h4 className="label stext">Dominio</h4>
-                                <p className="value ptext">{reportData.domain}</p>
+                                <a
+                                    className="value ptext"
+                                    href={reportData.domain.split("/")[0]}
+                                    target="_blank" rel="noopener noreferer"
+                                >
+                                    {reportData.domain.split("/")[0]}
+                                </a>
+
                             </li>
                             <li className="table-item">
                                 <h4 className="label stext">URL</h4>
-                                <p className="value ptext">{reportData.full_domain}</p>
+                                <a
+                                    className="value ptext"
+                                    href={reportData.full_domain}
+                                    target="_blank" rel="noopener noreferer"
+                                >
+                                    {reportData.full_domain}
+                                </a>
                             </li>
                             <li className="table-item">
                                 <h4 className="label stext">Dirección IP</h4>
-                                <p className="value ptext">{reportData.ip}</p>
+                                <div className="valueip">
+                                    {reportData.ip ? (
+                                        reportData.ip.map((ip, index) => (
+                                            <a
+                                                key={index}
+                                                className="value ptext"
+                                                href={`//${ip}`}
+                                                target="_blank" rel="noopener noreferer"
+                                            >
+                                                {ip}
+                                            </a>
+                                        ))) : (
+                                        <span>No disponible</span>
+                                    )}
+                                </div>
                             </li>
+                            {reportData.alias && (
+                                <li className="table-item">
+                                    <h4 className="label stext">Alias</h4>
+                                    <div className="valuealias">
+                                        {reportData.alias.map((alias, index) => (
+                                            <a
+                                                key={index}
+                                                className="value ptext"
+                                                href={`//${alias}`}
+                                                target="_blank" rel="noopener noreferer"
+                                            >
+                                                {alias}
+                                            </a>
+                                        ))}
+                                    </div>
+                                </li>
+                            )}
                             <li className="table-item">
                                 <h4 className="label stext">Protocolo</h4>
                                 <p className="value ptext">{reportData.protocol}</p>
                             </li>
+                            {reportData.server && (
+                                <li className="table-item">
+                                    <h4 className="label stext">Servidor</h4>
+                                    <p className="value ptext">{reportData.server}</p>
+                                </li>
+                            )}
+                            {reportData.generator && (
+                                <li className="table-item">
+                                    <h4 className="label stext">Generador</h4>
+                                    <p className="value ptext">{reportData.generator}</p>
+                                </li>
+                            )}
+                            {reportData.powered && (
+                                <li className="table-item">
+                                    <h4 className="label stext">Tecnología</h4>
+                                    <p className="value ptext">{reportData.powered}</p>
+                                </li>
+                            )}
                         </ul>
                     </div>
                     <div className="content-col ssl-info">

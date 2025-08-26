@@ -102,7 +102,13 @@ export default function ReportDetail() {
 							<ul className="card-body inner">
 								<li className="info-item">
 									<p className="label stext">Dominio</p>
-									<p className="value ptext">{reportData.domain}</p>
+									<a 
+										className="value ptext" 
+										href={reportData.domain.split("/")[0]} 
+										target="_blank" rel="noopener noreferer"
+									>
+										{reportData.domain.split("/")[0]}
+									</a>
 								</li>
 								<li className="info-item">
 									<p className="label stext">Protocolo</p>
@@ -110,11 +116,25 @@ export default function ReportDetail() {
 								</li>
 								<li className="info-item">
 									<p className="label stext">Dirección IP</p>
-									<p className="value ptext">#####TODO</p>
+									<div className="valueip">
+										{ reportData.ip ? (
+											reportData.ip.map((ip, index) => (
+												<a 
+													key={index}
+													className="value ptext" 
+													href={`//${ip}`} 
+													target="_blank" rel="noopener noreferer"
+												>
+													{ip}
+												</a>
+										))) : (
+											<span>No disponible</span>
+										)}
+									</div>
 								</li>
 								<li className="info-item">
 									<p className="label stext">Fecha</p>
-									<p className="value ptext">#####TODO{reportData.date}</p>
+									<p className="value ptext">{reportData.created_at.split("T")[0].split("-").reverse().join("/")}</p>
 								</li>
 							</ul>
 							<div className="card-buttons">

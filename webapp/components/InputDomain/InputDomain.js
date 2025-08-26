@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from 'react';
+import { useState } from 'react'
 
 export default function InputDomain({onSubmitScan}) {
-	const [domain, setDomain] = useState('');
+	const [domain, setDomain] = useState('')
 
 	const handleSubmit = (event) => {
         event.preventDefault()

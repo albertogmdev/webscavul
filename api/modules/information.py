@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 def get_information(domain, port, headers):
     socket = get_socket(domain, port)
     server_info = get_server(headers)
-    ip_info = socket[2] if socket[2] else None
+    ip_info = list(set(socket[2])) if socket[2] else None
     alias_info = socket[1] if socket[1] else None
 
     return {

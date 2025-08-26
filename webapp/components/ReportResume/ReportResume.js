@@ -52,7 +52,11 @@ export default function ReportResume({ report, onDeleteReport }) {
                 <div className="header-info">
                     <span className="info-icon icon icon-globe"></span>
                     <div className="info-main">
-                        <h3 className="report-title ptext">{report.full_domain}</h3>
+                        <h3 className="report-title ptext">
+                            <a href={report.full_domain} target="_blank" rel="noopener noreferer">
+                                {report.full_domain}
+                            </a>
+                        </h3>
                         <p className="report-protocol stext">{report.protocol}</p>
                     </div>
                 </div>

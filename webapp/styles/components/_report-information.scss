@@ -33,7 +33,23 @@
                         border-bottom: none;
                     }
 
+                    .valueip, 
+                    .valuealias {
+                        display: flex;
+                        flex-wrap: wrap;
+                        flex-direction: column;
+                        gap: 6px;
+                        
+                        .value {
+                            display: block;
+                            width: 100%;
+                            padding: 0px;
+                            word-wrap: break-word;
+                        }
+                    }
+
                     .value {
+                        display: block;
                         width: 0;
                         flex: 1 0;
                         font-size: 14px;
