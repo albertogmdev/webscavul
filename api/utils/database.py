@@ -9,10 +9,10 @@ import html
 
 from mariadb import ConnectionPool
 from dotenv import load_dotenv
-from core.models import ListCreate, ListUpdate, TaskCreate, TaskUpdate
+from core.models import ListCreate, TaskCreate
 
-report_fields = ["id", "title", "created_at", "domain", "full_domain", "protocol", "ip", "vulnerabilities", "port", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
-report_json_fields = ["ip", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
+report_fields = ["id", "title", "created_at", "domain", "full_domain", "protocol", "ip", "alias", "server", "powered", "generator", "vulnerabilities", "port", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
+report_json_fields = ["ip", "alias", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
 
 list_fields = ["id", "report_id", "title"]
 
@@ -73,9 +73,34 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
 
         # Insert report info
         report_sql = "INSERT INTO Report \
-            (id, title, domain, full_domain, protocol, ip, vulnerabilities, port, ssl_info, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        report_data = (report_id, report_title , session.domain, session.full_domain, session.schema, json.dumps(information), len(vulnerabilities), report_port, json.dumps(ssl), json.dumps(headers['hsts']), json.dumps(headers['csp']), json.dumps(headers['xframe']), json.dumps(headers['content_type']), json.dumps(headers['cookie']), json.dumps(headers['cache']), json.dumps(headers['xss']), json.dumps(headers['referrer']), json.dumps(headers['permissions']), json.dumps(headers['refresh']))
+            (id, title, domain, full_domain, protocol, ip, alias, server, powered, generator, vulnerabilities, port, ssl_info, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        print(information)
+        report_data = (
+            report_id, 
+            report_title , 
+            session.domain, 
+            session.full_domain, 
+            session.schema, 
+            json.dumps(information['ip']) if information['ip'] else None, 
+            json.dumps(information['alias']) if information['alias'] else None, 
+            information['server'],
+            information['powered'],
+            information['generator'],
+            len(vulnerabilities), 
+            report_port, 
+            json.dumps(ssl), 
+            json.dumps(headers['hsts']), 
+            json.dumps(headers['csp']), 
+            json.dumps(headers['xframe']), 
+            json.dumps(headers['content_type']), 
+            json.dumps(headers['cookie']), 
+            json.dumps(headers['cache']), 
+            json.dumps(headers['xss']), 
+            json.dumps(headers['referrer']), 
+            json.dumps(headers['permissions']), 
+            json.dumps(headers['refresh'])
+        )
         cursor.execute(report_sql, report_data)
 
         # Create default list
@@ -110,12 +135,12 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         db_connection.commit()
         cursor.close()
     except mariadb.Error as e:
-        print(f"ERROR: AAAA{e}")
         db_connection.rollback()
+        print(f"ERROR: {e}")
         return {"status": 500, "error": e}
     except Exception as e:
-        print(f"ERROR: BBB{e}")
         db_connection.rollback()
+        print(f"ERROR: {e}")
         return {"status": 500, "error": e}
     
     return {"status": 200, "data": {"report_id": report_id}}

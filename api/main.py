@@ -80,13 +80,30 @@ def custom_headers():
     
     return Response(content=content, media_type="text/html", headers=headers)
 
+@api.get("/analyze/info")
+async def analyze_info(domain: str):
+    session = Session()
+
+    if session.set_domain(domain):
+        if session.make_request():
+            result_information = information.get_information(session.full_domain, session.port, session.response.headers)
+            return {
+                "status": "success", 
+                "message": f"Información obtenida con éxito para el dominio {session.domain}.",
+                "data": {"information": result_information}
+            }
+        else:
+            raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
+    else:
+        raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
+
 @api.get("/analyze")
 async def analyze(domain: str):
     session = Session()
 
     if session.set_domain(domain):
         if session.make_request():
-            result_information = information.get_IP(session.full_domain, session.port)
+            result_information = information.get_information(session.full_domain, session.port, session.response.headers)
             result_headers = headers.analyze_headers(session.response.headers)
             result_ssl = ssl.analyze_ssl(session.domain, session.schema)
             
@@ -101,7 +118,8 @@ async def analyze(domain: str):
                     status_code=500,
                     detail={
                         "status": "error",
-                        "message": f"Error al crear el informe para el dominio {domain}"
+                        "message": f"Error al crear el informe para el dominio {domain}",
+                        "error": response["error"]
                     }
                 )
             else:

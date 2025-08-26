@@ -5,7 +5,6 @@ DROP TABLE IF EXISTS Report;
 DROP TABLE IF EXISTS List;
 DROP TABLE IF EXISTS Task;
 
-
 -- Create Schema
 CREATE TABLE Report (
     id VARCHAR(255) PRIMARY KEY,
@@ -15,6 +14,10 @@ CREATE TABLE Report (
     full_domain VARCHAR(255) NOT NULL,
     protocol VARCHAR(6) NOT NULL,
     ip JSON,
+    alias JSON,
+    server VARCHAR(255),
+    powered VARCHAR(255),
+    generator VARCHAR(255),
     vulnerabilities INT,
     port INT,
     ssl_info JSON,
@@ -30,6 +33,7 @@ CREATE TABLE Report (
     refresh JSON
 );
 
+-- Create List
 CREATE TABLE List (
     id INT AUTO_INCREMENT PRIMARY KEY,
     report_id VARCHAR(255) NOT NULL,
@@ -39,6 +43,7 @@ CREATE TABLE List (
         ON DELETE CASCADE
 );
 
+-- Create Task
 CREATE TABLE Task (
     id INT AUTO_INCREMENT PRIMARY KEY,
     list_id INT NOT NULL,

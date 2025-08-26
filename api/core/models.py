@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
 
+class ScanData(BaseModel):
+    type: str
+    domain: str
+
 class ListCreate(BaseModel):
     title: str
     report_id: str
