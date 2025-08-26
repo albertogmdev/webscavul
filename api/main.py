@@ -21,27 +21,32 @@ api.add_middleware(
     allow_methods=["*"],  
     allow_headers=["*"],
 )
+
 db_connection = None
+db_pool = None
 
 @api.on_event("startup")
 def startup_event():
     print("INFO: Intializing db connection")
-    global db_connection
-    db_connection = database.create_db_connection()
+    ## Usage of single connection
+    # global db_connection
+    # db_connection = database.create_db_connection()
 
     ## Usage of connection pool
-    # pool = database.create_db_pool(5)
-    # connection = pool.get_connection()
-    # cur = conn.cursor()
-    # Execute actions in DB
-    # cur.close()
-    # conn.close()
-
+    global db_pool
+    db_pool = database.create_db_pool(5)
+    
 @api.on_event("shutdown")
 def shutdown_event():
     global db_connection
     if db_connection:
         db_connection.close()
+        print("INFO: DB connection closed!")
+    
+    global db_pool
+    if db_pool:
+        db_pool.close()
+        print("INFO: DB onnection pool closed!")
 
 @api.get("/custom-headers")
 def custom_headers():
@@ -80,372 +85,404 @@ def custom_headers():
     
     return Response(content=content, media_type="text/html", headers=headers)
 
-@api.get("/analyze/info")
-async def analyze_info(domain: str):
-    session = Session()
-
-    if session.set_domain(domain):
-        if session.make_request():
-            result_information = information.get_information(session.full_domain, session.port, session.response.headers)
-            return {
-                "status": "success", 
-                "message": f"Información obtenida con éxito para el dominio {session.domain}.",
-                "data": {"information": result_information}
-            }
-        else:
-            raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
-    else:
-        raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
-
 @api.get("/analyze")
 async def analyze(domain: str):
     session = Session()
+    db_connection = db_pool.get_connection()
 
-    if session.set_domain(domain):
-        if session.make_request():
-            result_information = information.get_information(session.full_domain, session.port, session.response.headers)
-            result_headers = headers.analyze_headers(session.response.headers)
-            result_ssl = ssl.analyze_ssl(session.domain, session.schema)
-            
-            webpage = WebPage(session.domain)
-            await webpage.load_webpage(session.full_domain)
-            webparser.parse_webpage(webpage)
-            webanalyzer.analyze_webpage(webpage, result_headers)
-            
-            response = database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities)
-            if response["status"] != 200:
-                raise HTTPException(
-                    status_code=500,
-                    detail={
-                        "status": "error",
-                        "message": f"Error al crear el informe para el dominio {domain}",
-                        "error": response["error"]
+    try:
+        if session.set_domain(domain):
+            if session.make_request():
+                result_information = information.get_information(session.full_domain, session.port, session.response.headers)
+                result_headers = headers.analyze_headers(session.response.headers)
+                result_ssl = ssl.analyze_ssl(session.domain, session.schema)
+                
+                webpage = WebPage(session.domain)
+                await webpage.load_webpage(session.full_domain)
+                webparser.parse_webpage(webpage)
+                webanalyzer.analyze_webpage(webpage, result_headers)
+                
+                
+                response = database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities)
+                if response["status"] != 200:
+                    raise HTTPException(
+                        status_code=500,
+                        detail={
+                            "status": "error",
+                            "message": f"Error al crear el informe para el dominio {domain}",
+                            "error": response["error"]
+                        }
+                    )
+                else:
+                    return {
+                        "status": "success", 
+                        "message": f"Informe creado con éxito.",
+                        "data": response["data"]
                     }
-                )
             else:
-                return {
-                    "status": "success", 
-                    "message": f"Informe creado con éxito.",
-                    "data": response["data"]
-                }
+                raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
         else:
-            raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
-    else:
-        raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
-
-@api.get("/analyze/syntax")
-async def analyze_syntax():
-    result = {}
-    headers = {"hsts":{"enabled":False},"csp":{"enabled":False},"xframe":{"enabled":False},"content_type":{"enabled":False,"correct":False},"cookie":{"enabled":False},"cache":{"enabled":False,"correct":False},"xss":{"enabled":False,"correct":False},"referrer":{"enabled":False,"correct":False},"permissions":{"enabled":False,"correct":False},"refresh":{"enabled":False}}
-
-    webpage = WebPage("localhost/custom-headers")
-    await webpage.load_webpage("http://localhost/custom-headers")
-    webparser.parse_webpage(webpage)
-    result['syntax'] = webanalyzer.analyze_webpage(webpage, headers)
-    
-    return result
+            raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
+    finally:
+        db_connection.close()
 
 # Database operations endpoints
 ## REPORT
 @api.get("/report/{report_id}")
 def get_report(report_id: str):
-    report = database.get_report_by_id(db_connection, report_id)
-    if not report:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Informe {report_id} no encontrado."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        report = database.get_report_by_id(db_connection, report_id)
+        if not report:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Informe {report_id} no encontrado."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Informe {report_id} encontrado.",
-        "data": {"report": report}
-    }
+        return {
+            "status": "success", 
+            "message": f"Informe {report_id} encontrado.",
+            "data": {"report": report}
+        }
+    finally:
+        db_connection.close()
 
 @api.get("/reports")
 def get_all_reports():
-    reports = database.get_all_reports(db_connection)
+    db_connection = db_pool.get_connection()
+    try:
+        reports = database.get_all_reports(db_connection)
 
-    return {
-        "status": "success", 
-        "message": "Informes encontrados.",
-        "data": {"reports": reports}
-    }
+        return {
+            "status": "success", 
+            "message": "Informes encontrados.",
+            "data": {"reports": reports}
+        }
+    finally:
+        db_connection.close()
 
 @api.get("/report/{report_id}/board")
 def get_report_board(report_id: str):
-    if not database.get_report_by_id(db_connection, report_id):
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Reporte {report_id} no encontrado."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        if not database.get_report_by_id(db_connection, report_id):
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Reporte {report_id} no encontrado."
+                }
+            )
 
-    board = database.get_report_board(db_connection, report_id)
-    if not board:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Tablero del informe {report_id} no encontrado o no se encontraron listas de tareas."
-            }
-        )
+        board = database.get_report_board(db_connection, report_id)
+        if not board:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Tablero del informe {report_id} no encontrado o no se encontraron listas de tareas."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Informe {report_id} encontrado.",
-        "data": {"board": board}
-    }
+        return {
+            "status": "success", 
+            "message": f"Informe {report_id} encontrado.",
+            "data": {"board": board}
+        }
+    finally:
+        db_connection.close()
 
 @api.delete("/report/{report_id}")
 def delete_report(report_id: str):
-    if not database.get_report_by_id(db_connection, report_id):
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Informe {report_id} no encontrado."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        if not database.get_report_by_id(db_connection, report_id):
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Informe {report_id} no encontrado."
+                }
+            )
 
-    deleted = database.delete_report(db_connection, report_id)
-    if not deleted:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": f"Error al eliminar el informe {report_id}"
-            }
-        )
+        deleted = database.delete_report(db_connection, report_id)
+        if not deleted:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": f"Error al eliminar el informe {report_id}"
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Informe {report_id} eliminado correctamente",
-        "data": {"report_id": report_id}
-    }
+        return {
+            "status": "success", 
+            "message": f"Informe {report_id} eliminado correctamente",
+            "data": {"report_id": report_id}
+        }
+    finally:
+        db_connection.close()
 
 ## LIST
 @api.get("/list/{list_id}")
 def get_list(list_id: str):
-    list = database.get_list_by_id(db_connection, list_id)
-    if not list: 
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Lista {list_id} no encontrada."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        list = database.get_list_by_id(db_connection, list_id)
+        if not list: 
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Lista {list_id} no encontrada."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Lista {list_id} encontrada.",
-        "data": {"list": list}
-    }
+        return {
+            "status": "success", 
+            "message": f"Lista {list_id} encontrada.",
+            "data": {"list": list}
+        }
+    finally:
+        db_connection.close()
 
 @api.get("/report/{report_id}/lists")
 def get_report_lists(report_id: str):
-    if not database.get_report_by_id(db_connection, report_id): 
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Informe {report_id} no encontrado."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        if not database.get_report_by_id(db_connection, report_id): 
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Informe {report_id} no encontrado."
+                }
+            )
 
-    lists = database.get_lists_by_report(db_connection, report_id)
-    if not lists: 
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Listas del reporte {report_id} no encontradas."
-            }
-        )
+        lists = database.get_lists_by_report(db_connection, report_id)
+        if not lists: 
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Listas del reporte {report_id} no encontradas."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Listas de del reporte {report_id} encontradas.",
-        "data": {"lists": lists}
-    }
+        return {
+            "status": "success", 
+            "message": f"Listas de del reporte {report_id} encontradas.",
+            "data": {"lists": lists}
+        }
+    finally:
+        db_connection.close()
 
 @api.post("/list")
 def create_list(list: ListCreate):
-    list_id = database.create_list(db_connection, list)
-    if not list_id:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": f"Error al crear la lista {list.title}"
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        list_id = database.create_list(db_connection, list)
+        if not list_id:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": f"Error al crear la lista {list.title}"
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Lista {list_id} creada correctamente.",
-        "data": {"list_id": list_id}
-    }
+        return {
+            "status": "success", 
+            "message": f"Lista {list_id} creada correctamente.",
+            "data": {"list_id": list_id}
+        }
+    finally:
+        db_connection.close()
 
 @api.delete("/list/{list_id}")
 def delete_list(list_id: str):
-    deleted = database.delete_list(db_connection, list_id)
-    if not deleted:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": f"Error al eliminar la lista {list_id}."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        deleted = database.delete_list(db_connection, list_id)
+        if not deleted:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": f"Error al eliminar la lista {list_id}."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Lista {list_id} eliminada correctamente.",
-        "data": {"list_id": list_id}
-    }
+        return {
+            "status": "success", 
+            "message": f"Lista {list_id} eliminada correctamente.",
+            "data": {"list_id": list_id}
+        }
+    finally:
+        db_connection.close()
 
 @api.put("/list/{list_id}")
 def update_list(list_id: str, list: ListUpdate):
-    update_fields = {key: value for key, value in list.dict().items() if value is not None}
-    print(f"Update fields: {update_fields}")
-    if not update_fields or len(update_fields) < 1:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": "No se proporcionaron campos válidos a actualizar."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        update_fields = {key: value for key, value in list.dict().items() if value is not None}
+        print(f"Update fields: {update_fields}")
+        if not update_fields or len(update_fields) < 1:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": "No se proporcionaron campos válidos a actualizar."
+                }
+            )
 
-    new_list = database.update_list(db_connection, list_id, update_fields)
-    if not new_list:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": f"Error al actualizar la lista {list_id} o el 'report_id' es incorrecto."
-            }
-        )
+        new_list = database.update_list(db_connection, list_id, update_fields)
+        if not new_list:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": f"Error al actualizar la lista {list_id} o el 'report_id' es incorrecto."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Lista {list_id} actualizada correctamente.",
-        "data": {"list": new_list}
-    }
+        return {
+            "status": "success", 
+            "message": f"Lista {list_id} actualizada correctamente.",
+            "data": {"list": new_list}
+        }
+    finally:
+        db_connection.close()
 
 ## TASK
 @api.get("/task/{task_id}")
 def get_task(task_id: str):
-    task = database.get_task_by_id(db_connection, task_id)
-    if not task: 
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Tarea {task_id} no encontrada."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        task = database.get_task_by_id(db_connection, task_id)
+        if not task: 
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Tarea {task_id} no encontrada."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Tarea {task_id} encontrada.",
-        "data": {"task": task}
-    }
+        return {
+            "status": "success", 
+            "message": f"Tarea {task_id} encontrada.",
+            "data": {"task": task}
+        }
+    finally:
+        db_connection.close()
 
 @api.get("/list/{list_id}/tasks")
 def get_list_tasks(list_id: str):
-    if not database.get_list_by_id(db_connection, list_id): 
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Lista {list_id} no encontrada."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        if not database.get_list_by_id(db_connection, list_id): 
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Lista {list_id} no encontrada."
+                }
+            )
 
-    tasks = database.get_tasks_by_list(db_connection, list_id)
-    if not tasks: 
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": f"Tareas de las lista {list_id} no encontradas."
-            }
-        )
+        tasks = database.get_tasks_by_list(db_connection, list_id)
+        if not tasks: 
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": f"Tareas de las lista {list_id} no encontradas."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Tareas de las lista {list_id} encontradas.",
-        "data": {"tasks": tasks}
-    }
+        return {
+            "status": "success", 
+            "message": f"Tareas de las lista {list_id} encontradas.",
+            "data": {"tasks": tasks}
+        }
+    finally:
+        db_connection.close()
 
 @api.post("/task")
 def create_task(task: TaskCreate):
-    task_id = database.create_task(db_connection, task)
-    if not task_id:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": f"Error al crear la lista {task.title}"
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        task_id = database.create_task(db_connection, task)
+        if not task_id:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": f"Error al crear la lista {task.title}"
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Tarea '{task.title}' creada correctamente.",
-        "data": {"task_id": task_id}
-    }
+        return {
+            "status": "success", 
+            "message": f"Tarea '{task.title}' creada correctamente.",
+            "data": {"task_id": task_id}
+        }
+    finally:
+        db_connection.close()
 
 @api.delete("/task/{task_id}")
 def delete_task(task_id: str):
-    deleted = database.delete_task(db_connection, task_id)
-    if not deleted:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": f"Error al eliminar la tarea {task_id}."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        deleted = database.delete_task(db_connection, task_id)
+        if not deleted:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": f"Error al eliminar la tarea {task_id}."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Tarea {task_id} eliminada correctamente.",
-        "data": {"task_id": task_id}
-    }
+        return {
+            "status": "success", 
+            "message": f"Tarea {task_id} eliminada correctamente.",
+            "data": {"task_id": task_id}
+        }
+    finally:
+        db_connection.close()
 
 @api.put("/task/{task_id}")
 def update_task(task_id: str, task: TaskUpdate):
-    update_fields = {key: value for key, value in task.dict().items() if value is not None}
-    if not update_fields or len(update_fields) < 1:
-        raise HTTPException(
-            status_code=404,
-            detail={
-                "status": "error",
-                "message": "No se proporcionaron campos válidos a actualizar."
-            }
-        )
+    db_connection = db_pool.get_connection()
+    try:
+        update_fields = {key: value for key, value in task.dict().items() if value is not None}
+        if not update_fields or len(update_fields) < 1:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "status": "error",
+                    "message": "No se proporcionaron campos válidos a actualizar."
+                }
+            )
 
-    new_task = database.update_task(db_connection, task_id, update_fields)
-    if not new_task:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "status": "error",
-                "message": f"Error al actualizar la tarea {task_id} o el 'list_id' es incorrecto."
-            }
-        )
+        new_task = database.update_task(db_connection, task_id, update_fields)
+        if not new_task:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "status": "error",
+                    "message": f"Error al actualizar la tarea {task_id} o el 'list_id' es incorrecto."
+                }
+            )
 
-    return {
-        "status": "success", 
-        "message": f"Tarea {task_id} actualizada correctamente.",
-        "data": {"task": new_task}
-    }
+        return {
+            "status": "success", 
+            "message": f"Tarea {task_id} actualizada correctamente.",
+            "data": {"task": new_task}
+        }
+    finally:
+        db_connection.close()

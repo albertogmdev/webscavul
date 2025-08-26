@@ -21,21 +21,28 @@ task_fields = ["id", "list_id", "title", "type", "severity", "location", "code",
 # Create a db connection pool
 def create_db_pool(threads: int) -> ConnectionPool:
     load_dotenv()
-    try:
-        pool = ConnectionPool(
-            pool_name="mypool",
-            pool_size=threads,
-            user=os.environ['DB_ROOT_USER'],
-            password=os.environ['DB_PASSWORD'],
-            host=os.environ['DB_HOST'],
-            port=int(os.environ['DB_PORT']),
-            database=os.environ['DB_NAME']
-        )
-    except mariadb.Error as e:
-        print(f"Error creating DB pool connection: {e}")
-        sys.exit(1)
-    
-    return pool
+
+    for connection_try in range(10):
+        try:
+            pool = ConnectionPool(
+                pool_name="mypool",
+                pool_size=threads,
+                user=os.environ['DB_USER'],
+                password=os.environ['DB_PASSWORD'],
+                host=os.environ['DB_HOST'],
+                port=int(os.environ['DB_PORT']),
+                database=os.environ['DB_NAME']
+            )
+            
+            print(f"INFO: Connection pool created, size: {threads}")
+            print("INFO: Connected to MariaDB!")
+            return pool
+        except mariadb.Error as e:
+            print(f"INFO: Try {connection_try+1}/10, {e}")
+            time.sleep(3)
+
+    print("ERROR: Imposible to connect, several tries done.")
+    sys.exit(1)
 
 # Create a single db connection
 def create_db_connection():
@@ -60,8 +67,6 @@ def create_db_connection():
 
     print("ERROR: Imposible to connect, several tries done.")
     sys.exit(1)
-    
-    return connection
 
 # REPORT CRUD
 def create_report(db_connection, session, information, headers, ssl, vulnerabilities) -> dict:
@@ -75,7 +80,6 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         report_sql = "INSERT INTO Report \
             (id, title, domain, full_domain, protocol, ip, alias, server, powered, generator, vulnerabilities, port, ssl_info, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        print(information)
         report_data = (
             report_id, 
             report_title , 
