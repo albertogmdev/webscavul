@@ -5,7 +5,7 @@
     --quaternary-bg: #475569;
     --card-bg: #1E293B;
     --card-secondarybg: #334155;
-    --shadow: #F9FAFB;
+    --color: 0, 0, 0;
     --contrast: 255, 255, 255;
 
     --primary-text: #F8FAFC;
@@ -38,13 +38,13 @@
 }
 
 .theme-light {
-    --primary-bg: #F9FAFB;
+    --primary-bg: #f4f4f5;
     --secondary-bg: #F3F4F6;
     --tertiary-bg: #E5E7EB;
     --quaternary-bg: #D1D5DB;
-    --card-bg: #FFFFFF;
+    --card-bg: #fdfdfd;
     --card-secondarybg: #ebebeb;
-    --shadow: #0F172A;
+    --color: 255, 255, 255;
     --contrast: 0, 0, 0;
 
     --primary-text: #111827;
@@ -83,7 +83,6 @@ $tertiaryBg: var(--tertiary-bg);
 $quaternaryBg: var(--quaternary-bg);
 $cardBg: var(--card-bg);
 $cardSecondaryBg: var(--card-secondarybg);
-$shadow: var(--shadow);
 $primaryText: var(--primary-text);
 $secondaryText: var(--secondary-text);
 $mutedText: var(--muted-text);
@@ -106,6 +105,7 @@ $primaryAccent: var(--primary-accent);
 $primaryAccentBg: var(--primary-accent-bg);
 $primaryAccentText: var(--primary-accent-text);
 $primaryAccentHover: var(--primary-accent-hover);
+$color: var(--color);
 $contrast: var(--contrast);
 
 /// Breakpoints

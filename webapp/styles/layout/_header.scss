@@ -5,11 +5,12 @@
     justify-content: space-between;
     align-items: center;
     position: fixed;
-    top: 0;
+    top: -1px;
     left: 0;
     width: 100%;
     padding: 24px;
-    background-color: $primaryBg;
+    background: rgba($color, 0.2);
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid $primaryBorder;
     z-index: 1;
 
