@@ -30,6 +30,7 @@
     --info-border: #1E40AF;
 
     --primary-accent: #1D4ED8;
+    --primary-accent-bg: #1d4fd867;
     --primary-accent-hover: #153e95;
     --primary-accent-text: #2568f7;
     --secondary-accent: #8B5CF6;
@@ -86,6 +87,7 @@ $infoText: var(--info-text);
 $infoBg: var(--info-bg);
 $infoBorder: var(--info-border);
 $primaryAccent: var(--primary-accent);
+$primaryAccentBg: var(--primary-accent-bg);
 $primaryAccentText: var(--primary-accent-text);
 $primaryAccentHover: var(--primary-accent-hover);
 $contrast: var(--contrast);

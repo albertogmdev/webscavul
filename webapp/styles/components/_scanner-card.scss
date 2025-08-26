@@ -1,6 +1,7 @@
 @use '../abstracts' as *;
 
 .scanner-card {
+    position: relative;
     width: 100%;
     max-width: 850px;
     margin: 0 auto;
@@ -9,20 +10,65 @@
     border: 1px solid $primaryBorder;
     border-radius: $radius;
     padding: 40px 24px;
+    overflow: hidden;
+    z-index: 1;
 
     .scanner-config {
         margin-top: 40px;
         padding-top: 20px;
         border-top: 1px solid $secondaryBorder;
-        
+
         .config-title {
             font-size: 16px;
-            margin-bottom: 10px;    
+            margin-bottom: 10px;
             color: $secondaryText;
         }
     }
 
-    .scanner-others {
+    .scanner-others {}
 
+    .loading-layout {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 10;
+
+        .loading-text {
+            position: absolute;
+            top: calc(45% + 30px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            color: $primaryAccent;
+        }
+
+        .spinner {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid $primaryAccent;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
     }
 }

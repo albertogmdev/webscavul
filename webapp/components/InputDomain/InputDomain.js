@@ -7,6 +7,7 @@ export default function InputDomain({onSubmitScan}) {
 
 	const handleSubmit = (event) => {
         event.preventDefault()
+		event.target.elements['domain'].blur()
         if (onSubmitScan) onSubmitScan(domain)
     }
 

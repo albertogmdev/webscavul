@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from 'react';
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createReport } from "@api"
 import InputDomain from "@/components/InputDomain/InputDomain"
 
 export default function ScannerCard() {
+	const [loading, setLoading] = useState(false)
+	const router = useRouter()
+
 	const isValidDomain = (domain) => {
 		const regex = new RegExp(
 			'^(?:https?://)?' +
@@ -19,35 +22,51 @@ export default function ScannerCard() {
 		return domain !== null && regex.test(domain)
 	}
 
-    const handleScan = async (domain) => {
-		console.log("Escaneando " + domain)
+	const handleScan = async (domain) => {
+		console.log("Scanning domain:", domain)
+		setLoading(true)
 
-		if (isValidDomain(domain)) {
-			const response = await createReport(domain)
-
-			if (response.status == 200) {
-				const reportId = response.data.report_id
-				// TODO - Show a success modal or smth
-				redirect(`/report/${reportId}`)
+		try {
+			if (isValidDomain(domain)) {
+				const response = await createReport(domain)
+				if (response.status == 200) {
+					const reportId = response.data.report_id
+					router.push(`/report/${reportId}`)
+				}
+				else {
+					// TODO - Mostrar error
+					console.log("DOMINIO NO VALIDO")
+					setLoading(false)
+				}
 			}
-
-			// TODO - Handle error
+			else {
+				// TODO - Mostrar error
+				console.log("DOMINIO NO VALIDO")
+				setLoading(false)
+			}
 		}
-		else {
+		catch (error) {
 			// TODO - Mostrar error
-			console.log("DOMINIO NO VALIDO")
+			console.error("Error creating report:", error)
+			setLoading(false)
 		}
 	}
 
-    return (
-        <div className="scanner-card">
-            <InputDomain onSubmitScan={handleScan} />
-            {/* <div className="scanner-config">
+	return (
+		<div className="scanner-card">
+			{loading && (
+				<div className="loading-layout">
+					<div className="spinner"></div>
+					<div className="loading-text ptext">Escaneando dominio...</div>
+				</div>
+			)}
+			<InputDomain onSubmitScan={handleScan} />
+			{/* <div className="scanner-config">
                 <p className="config-title">Configuración</p>
             </div>
             <div className="scanner-others">
 
             </div> */}
-        </div>
-    )
+		</div>
+	)
 }
