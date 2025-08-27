@@ -60,7 +60,7 @@
 
             .resume-card {
                 padding: 24px;
-                width: calc(100% / 3 - (16px * 2 / 3));
+                flex: 1 1 0;
 
                 .resume-title {
                     font-size: 18px;

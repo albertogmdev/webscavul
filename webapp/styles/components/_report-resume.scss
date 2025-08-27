@@ -82,6 +82,20 @@
         }
     }
 
+    .resume-type {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 24px;
+        margin-bottom: 16px;
+
+        p {
+            font-weight: 700;
+            font-size: 14px;
+            color: $secondaryText;
+        }
+    }
+
     .resume-buttons {
         display: flex;
         justify-content: flex-end;

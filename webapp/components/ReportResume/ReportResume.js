@@ -2,6 +2,10 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
 export default function ReportResume({ report, onDeleteReport }) {
+    const scanTypes = {
+        "full": "Completo",
+        "headers": "Cabeceras"
+    }
     const [isActionMenuOpen, setActionMenuOpen] = useState(false)
     const [certificateInfo, setCertificateInfo] = useState(null)
 
@@ -72,6 +76,12 @@ export default function ReportResume({ report, onDeleteReport }) {
                     </ul>
                 )}
             </div>
+            <div className="resume-type">
+                <p>Tipo de escaneo: </p>
+                <div className="chip chip--info">
+                    <span className="chip-text"> {scanTypes[report.type]} </span>
+                </div>
+            </div>
             <div className="resume-content">
                 <div className="resume-item">
                     <h4 className="item-title">Estado</h4>
@@ -91,10 +101,12 @@ export default function ReportResume({ report, onDeleteReport }) {
                         </div>
                     )}
                 </div>
-                <div className="resume-item">
-                    <h4 className="item-title">Vulnerabilidades</h4>
-                    <p className="item-text">{report.vulnerabilities} encontradas</p>
-                </div>
+                {report.type === "full" && (
+                    <div className="resume-item">
+                        <h4 className="item-title">Vulnerabilidades</h4>
+                        <p className="item-text">{report.vulnerabilities} encontradas</p>
+                    </div>
+                )}
                 <div className="resume-item">
                     <h4 className="item-title">Fecha</h4>
                     <p className="item-text">{report.created_at.split("T")[0].split("-").reverse().join("/")}</p>
@@ -104,9 +116,11 @@ export default function ReportResume({ report, onDeleteReport }) {
                 <Link href={`/report/${report.id}`} className="button button-primary">
                     Ver informe
                 </Link>
-                <Link href={`/report/${report.id}/board`} className="button button-secondary">
-                    Ver tablero
-                </Link>
+                {report.type === "full" && (
+                    <Link href={`/report/${report.id}/board`} className="button button-secondary">
+                        Ver tablero
+                    </Link>
+                )}
             </div>
         </div>
     )

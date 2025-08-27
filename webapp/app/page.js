@@ -1,6 +1,6 @@
 import ScannerCard from '@/components/ScannerCard/ScannerCard'
 
-export default function Home() {
+export default async function Home() {
 	return (
 		<div className="page page-home">
 			<section className="scan-hero">
@@ -14,7 +14,6 @@ export default function Home() {
 			</section>
 			<section className="home-info">
 				<div className="container">
-					
 				</div>
 			</section>
 		</div>

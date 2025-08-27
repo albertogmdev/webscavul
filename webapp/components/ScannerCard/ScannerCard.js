@@ -28,7 +28,8 @@ export default function ScannerCard() {
 
 		try {
 			if (isValidDomain(domain)) {
-				const response = await createReport(domain)
+				const type = "full"
+				const response = await createReport(domain, type)
 				if (response.status == 200) {
 					const reportId = response.data.report_id
 					router.push(`/report/${reportId}`)
@@ -61,12 +62,19 @@ export default function ScannerCard() {
 				</div>
 			)}
 			<InputDomain onSubmitScan={handleScan} />
-			{/* <div className="scanner-config">
-                <p className="config-title">Configuración</p>
-            </div>
-            <div className="scanner-others">
-
-            </div> */}
+			<div className="scanner-type">
+				<p className="type-title">Tipo de escaneo</p>
+				<div className="type-options">
+					<div className="type-option">
+						<input type="radio" id="headers" name="scan-type" value="headers" />
+						<label htmlFor="headers" className="stext">Cabeceras</label>
+					</div>
+					<div className="type-option">
+						<input type="radio" id="full" name="scan-type" value="full" />
+						<label htmlFor="full" className="stext">Completo</label>
+					</div>
+				</div>
+			</div>
 		</div>
 	)
 }

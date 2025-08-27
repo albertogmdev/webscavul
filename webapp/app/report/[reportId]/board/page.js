@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from "react"
 import { getReportBoard, deleteList, createList, moveTask, deleteTask, updateList } from '@/api'
 import Link from 'next/link'
@@ -10,6 +11,7 @@ import Modal from "@components/Modal/Modal"
 
 export default function ReportBoard() {
 	const params = useParams()
+	const router = useRouter()
 	const reportId = params.reportId
 
 	const [boardData, setBoardData] = useState(null)
@@ -26,8 +28,13 @@ export default function ReportBoard() {
 		const getBoardInfo = async () => {
 			try {
 				const response = await getReportBoard(reportId)
-
 				if (response.status == 200) {
+					// Redirect to report page when scan type is not "full"
+					if (response.data.board && response.data.board === "noboard") {
+						router.push(`/report/${reportId}`)
+						return
+					}
+
 					const board = response.data.board
 
 					setBoardData(board)

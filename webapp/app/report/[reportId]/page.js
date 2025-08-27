@@ -20,7 +20,10 @@ export default function ReportDetail() {
 
 	useEffect(() => {
 		const processHeaders = (headers) => {
-			const correctHeadersCount = headers.filter(header => header.correct && header.enabled).length;
+			const correctHeadersCount = headers.filter(header => 
+				header.correct && header.enabled
+				|| header.name === "Refresh" && !header.enabled
+			).length;
 			const totalHeadersCount = headers.length
 
 			setHeaderData({
@@ -64,7 +67,7 @@ export default function ReportDetail() {
 					processHeaders([report.hsts, report.csp, report.xframe, report.content_type, report.cookie, report.cache, report.xss, report.referrer, report.permissions, report.refresh])
 				}
 				else {
-					console.error("Error fetching report "+ reportId)
+					console.error("Error fetching report " + reportId)
 					setError(`Error al cargar el informe ${reportId} o informe no existente.`)
 				}
 			} catch (err) {
@@ -102,9 +105,9 @@ export default function ReportDetail() {
 							<ul className="card-body inner">
 								<li className="info-item">
 									<p className="label stext">Dominio</p>
-									<a 
-										className="value ptext" 
-										href={reportData.domain.split("/")[0]} 
+									<a
+										className="value ptext"
+										href={reportData.domain.split("/")[0]}
 										target="_blank" rel="noopener noreferer"
 									>
 										{reportData.domain.split("/")[0]}
@@ -117,17 +120,17 @@ export default function ReportDetail() {
 								<li className="info-item">
 									<p className="label stext">Dirección IP</p>
 									<div className="valueip">
-										{ reportData.ip ? (
+										{reportData.ip ? (
 											reportData.ip.map((ip, index) => (
-												<a 
+												<a
 													key={index}
-													className="value ptext" 
-													href={`//${ip}`} 
+													className="value ptext"
+													href={`//${ip}`}
 													target="_blank" rel="noopener noreferer"
 												>
 													{ip}
 												</a>
-										))) : (
+											))) : (
 											<span>No disponible</span>
 										)}
 									</div>
@@ -153,18 +156,20 @@ export default function ReportDetail() {
 							</div>
 						</div>
 						<ul className="resume-list">
-							<li className="card resume-card">
-								<h3 className="resume-title">Vulnerabilidades</h3>
-								<p className="resume-value">{reportData.vulnerabilities} vulnerabilidades encontradas</p>
-								<div className="resume-buttons">
-									<Link
-										href={`/report/${reportId}/board`}
-										className="button button-primary"
-									>
-										Ver tablero
-									</Link>
-								</div>
-							</li>
+							{reportData.type === "full" && (
+								<li className="card resume-card">
+									<h3 className="resume-title">Vulnerabilidades</h3>
+									<p className="resume-value">{reportData.vulnerabilities} vulnerabilidades encontradas</p>
+									<div className="resume-buttons">
+										<Link
+											href={`/report/${reportId}/board`}
+											className="button button-primary"
+										>
+											Ver tablero
+										</Link>
+									</div>
+								</li>
+							)}
 							<li className="card resume-card">
 								<h3 className="resume-title">Cabeceras</h3>
 								<p className="resume-value">{headerData.correct} / {headerData.total} cabeceras configuradas</p>
@@ -181,12 +186,12 @@ export default function ReportDetail() {
 							</li>
 						</ul>
 					</section>
-					<ReportInformation 
-						reportData={reportData} 
-						sslData={sslData} 
+					<ReportInformation
+						reportData={reportData}
+						sslData={sslData}
 					/>
-					<ReportHeaders 
-						headerData={headerData} 
+					<ReportHeaders
+						headerData={headerData}
 					/>
 				</>)))}
 			</div>

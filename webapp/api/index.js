@@ -46,13 +46,16 @@ export async function fetchData(endpoint, options = {}) {
 }
 
 // REPORT API CALLS
-export const createReport = async (scanDomain) => {
+export const createReport = async (scanDomain, type) => {
+    const scanTypes = ["full", "headers"]
     try {
-        const endpoint = `/analyze?domain=${scanDomain}`
+        if (!type || !scanTypes.includes(type)) throw new Error(`Invalid scan type: ${type}. Valid types are: ${scanTypes.join(", ")}`)
+        
+        const endpoint = `/analyze${type !== "full" ? "/"+type : ""}?domain=${scanDomain}`
         const response = await fetchData(endpoint)
         return response
     } catch (error) {
-        console.error(`Failed to fetch from ${endpoint}:`, error);
+        console.error(`Failed to create a report:`, error);
         throw error;
     }
 }  
