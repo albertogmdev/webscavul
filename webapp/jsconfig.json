@@ -4,7 +4,8 @@
       "@/*": ["./*"],
       "@styles/*": ["./styles/*"],
       "@components/*": ["./components/*"],
-      "@api": ["./api"]
+      "@api": ["./api"],
+      "@utils": ["./utils"]
     }
   }
 }
