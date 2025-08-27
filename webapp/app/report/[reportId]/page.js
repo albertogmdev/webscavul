@@ -23,7 +23,7 @@ export default function ReportDetail() {
 			const correctHeadersCount = headers.filter(header => 
 				header.correct && header.enabled
 				|| header.name === "Refresh" && !header.enabled
-			).length;
+			).length
 			const totalHeadersCount = headers.length
 
 			setHeaderData({

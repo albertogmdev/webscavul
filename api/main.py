@@ -103,7 +103,42 @@ async def analyze(domain: str):
                 webanalyzer.analyze_webpage(webpage, result_headers)
                 
                 
-                response = database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities)
+                response = database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities, "full")
+                if response["status"] != 200:
+                    raise HTTPException(
+                        status_code=500,
+                        detail={
+                            "status": "error",
+                            "message": f"Error al crear el informe para el dominio {domain}",
+                            "error": response["error"]
+                        }
+                    )
+                else:
+                    return {
+                        "status": "success", 
+                        "message": f"Informe creado con éxito.",
+                        "data": response["data"]
+                    }
+            else:
+                raise HTTPException(status_code=400, detail=f"El dominio {session.domain} no resuelve o no es accesible")
+        else:
+            raise HTTPException(status_code=400, detail="Formato de dominio incorrecto o no válido")
+    finally:
+        db_connection.close()
+
+@api.get("/analyze/headers")
+async def analyze_headers(domain: str):
+    session = Session()
+    db_connection = db_pool.get_connection()
+
+    try:
+        if session.set_domain(domain):
+            if session.make_request():
+                result_information = information.get_information(session.full_domain, session.port, session.response.headers)
+                result_headers = headers.analyze_headers(session.response.headers)
+                result_ssl = ssl.analyze_ssl(session.domain, session.schema)
+                
+                response = database.create_report(db_connection, session, result_information, result_headers, result_ssl, [], "headers")
                 if response["status"] != 200:
                     raise HTTPException(
                         status_code=500,
@@ -168,7 +203,8 @@ def get_all_reports():
 def get_report_board(report_id: str):
     db_connection = db_pool.get_connection()
     try:
-        if not database.get_report_by_id(db_connection, report_id):
+        report = database.get_report_by_id(db_connection, report_id)
+        if not report:
             raise HTTPException(
                 status_code=404,
                 detail={
@@ -176,7 +212,14 @@ def get_report_board(report_id: str):
                     "message": f"Reporte {report_id} no encontrado."
                 }
             )
-
+        
+        if report["type"] != "full":
+            return {
+                "status": "noboard", 
+                "message": f"Informe {report_id} encontrado, pero no tiene tablero asociado (escaneo de cabeceras).",
+                "data": {"board": "noboard"}
+            }
+        
         board = database.get_report_board(db_connection, report_id)
         if not board:
             raise HTTPException(

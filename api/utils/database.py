@@ -11,7 +11,7 @@ from mariadb import ConnectionPool
 from dotenv import load_dotenv
 from core.models import ListCreate, TaskCreate
 
-report_fields = ["id", "title", "created_at", "domain", "full_domain", "protocol", "ip", "alias", "server", "powered", "generator", "vulnerabilities", "port", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
+report_fields = ["id", "type", "title", "created_at", "domain", "full_domain", "protocol", "ip", "alias", "server", "powered", "generator", "vulnerabilities", "port", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
 report_json_fields = ["ip", "alias", "ssl_info", "hsts", "csp", "xframe", "content_type", "cookie", "cache", "xss", "referrer", "permissions", "refresh"]
 
 list_fields = ["id", "report_id", "title"]
@@ -69,7 +69,7 @@ def create_db_connection():
     sys.exit(1)
 
 # REPORT CRUD
-def create_report(db_connection, session, information, headers, ssl, vulnerabilities) -> dict:
+def create_report(db_connection, session, information, headers, ssl, vulnerabilities, type) -> dict:
     try: 
         cursor = db_connection.cursor()
         report_id = hashlib.sha256(f"{session.full_domain}{datetime.datetime.now()}".encode()).hexdigest()
@@ -78,10 +78,11 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
 
         # Insert report info
         report_sql = "INSERT INTO Report \
-            (id, title, domain, full_domain, protocol, ip, alias, server, powered, generator, vulnerabilities, port, ssl_info, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            (id, type, title, domain, full_domain, protocol, ip, alias, server, powered, generator, vulnerabilities, port, ssl_info, hsts, csp, xframe, content_type, cookie, cache, xss, referrer, permissions, refresh) \
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         report_data = (
             report_id, 
+            type,
             report_title , 
             session.domain, 
             session.full_domain, 
@@ -107,6 +108,13 @@ def create_report(db_connection, session, information, headers, ssl, vulnerabili
         )
         cursor.execute(report_sql, report_data)
 
+        # Stop report board creation if no vulnerabilities
+        if not type == "full":
+            db_connection.commit()
+            cursor.close()
+            return {"status": 200, "data": {"report_id": report_id}}
+        
+        # Create report board
         # Create default list
         list_sql = "INSERT INTO List \
             (report_id, title, archived) \
