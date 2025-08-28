@@ -28,7 +28,7 @@ export default function ScannerCard() {
 
 		try {
 			if (isValidDomain(domain)) {
-				const type = "full"
+				const type = "headers"
 				const response = await createReport(domain, type)
 				if (response.status == 200) {
 					const reportId = response.data.report_id

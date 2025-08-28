@@ -1,5 +1,4 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-console.log("API BASE URL:", BASE_URL);
 
 export async function fetchData(endpoint, options = {}) {
     const headers = {

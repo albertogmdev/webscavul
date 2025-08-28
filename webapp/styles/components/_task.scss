@@ -75,6 +75,7 @@
         max-height: 50dvh;
         overflow-y: auto;
         margin-top: 10px;
+        padding-bottom: 20px;
 
         .content-title {
             margin-top: 30px;
@@ -101,18 +102,83 @@
                 font-size: 13px;
                 padding: 8px;
                 border-radius: 8px;
-                word-wrap: break-word;
                 background-color: $cardSecondaryBg;
-                overflow-x: scroll;
+            }
+        }
+
+        .task-location {
+            .content-info {
+                white-space: pre-wrap;
+                word-wrap: break-word;
             }
         }
 
         .task-code {
             .content-info {
+                overflow-x: auto;
+
                 pre {
                     margin: 0;
                     font-family: monospace;
                     font-size: 13px;
+                }
+            }
+        }
+
+        .task-generation {
+            .generate-button {
+                display: block;
+                width: 100%;
+                border: 1px dashed $primaryBorder;
+                text-align: center;
+                padding: 10px;
+                border-radius: $radius;
+                cursor: pointer;
+                transition: background-color .3s ease;
+
+                &:hover {
+                    background-color: $cardSecondaryBg;
+                }
+            }
+
+            .generated-content {
+                font-family: monospace;
+                font-size: 13px;
+                padding: 8px;
+                border-radius: 8px;
+                word-wrap: break-word;
+                background-color: $cardSecondaryBg;
+
+                p {
+                    margin-bottom: 10px;
+                }
+
+                pre,
+                code {
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                }
+
+                code {
+                    display: block;
+                    width: 100%;
+                    background-color: $cardBg;
+                    padding: 4px;
+                    border-radius: 4px;
+                }
+
+                ul,
+                ol {
+                    padding-left: 24px;
+                    list-style: decimal;
+                    margin-bottom: 16px;
+
+                    li {
+                        margin-bottom: 8px;
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                    }
                 }
             }
         }
@@ -130,4 +196,6 @@
             }
         }
     }
+
+
 }
