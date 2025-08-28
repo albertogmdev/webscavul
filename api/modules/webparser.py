@@ -240,17 +240,6 @@ def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
     # Heuristic for contact form
     if form.method and form.method != "" and form.method == "GET": types["contact"] += 1
     if "textarea" in form.fields_count: types["contact"] += 3
-
-    # max_value = -100
-    # selected_type = None
-    # multiple_types = False
-    # for type, value in types.items():
-    #     if value > max_value:
-    #         max_value = value
-    #         selected_type = type
-    #         multiple_types = False
-    #     if value == max_value and value > 0:
-    #         multiple_types = True
     
     max_score = max(types.values())
     likely_types = [t for t, score in types.items() if score == max_score]

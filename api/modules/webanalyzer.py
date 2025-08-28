@@ -10,14 +10,6 @@ def analyze_webpage(webpage: WebPage, headers: dict) -> dict:
     analyze_link_tags(webpage)
     analyze_links(webpage)
 
-    result = {}
-    for index, vulnerability in enumerate(webpage.vulnerabilities):
-        result[f"{vulnerability.type}-{index}"] = {
-            "nombre": vulnerability.name,
-            "text": vulnerability.location
-        }
-    return result
-
 def analyze_forms(webpage: WebPage):
     print("INFO: Analyzing forms in the webpage")
     

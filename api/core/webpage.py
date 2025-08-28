@@ -55,16 +55,6 @@ class WebPage:
             await page.goto(url)
             await page.wait_for_load_state("load")
 
-            try:
-                #TODO : Manejar el popup de las cookies
-                await page.wait_for_selector('text=Deny', state='visible', timeout=1000)
-                await page.click('text=Deny')
-                print("Botón 'Deny' clickeado exitosamente.")
-                #await page.screenshot(path="clicked_screenshot.png")
-            except Exception as e:
-                print(f"No se pudo clickear el botón 'Deny': {e}")
-                #await page.screenshot(path="error_click_screenshot.png")
-
             self.content = await page.content()
 
             await browser.close()
@@ -182,11 +172,10 @@ class LinkTag:
         self.code = code
     
 class Vulnerability:
-    def __init__(self, name: str, type: str, severity: str, details: str, location: str = "", code: str = "", payload: str = ""):
+    def __init__(self, name: str, type: str, severity: str, details: str, location: str = "", code: str = ""):
         self.name = name
         self.type = type
         self.severity = severity
         self.location = location if location is not None else ""
         self.code = code if code is not None else ""
         self.details = details
-        self.payload = payload

@@ -102,7 +102,6 @@ async def analyze(domain: str):
                 webparser.parse_webpage(webpage)
                 webanalyzer.analyze_webpage(webpage, result_headers)
                 
-                
                 response = database.create_report(db_connection, session, result_information, result_headers, result_ssl, webpage.vulnerabilities, "full")
                 if response["status"] != 200:
                     raise HTTPException(
