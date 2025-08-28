@@ -67,3 +67,11 @@
 .icon-more {
     @include mask-icon(url("#{$base-url}/img/icon-more.svg"));
 }
+
+.icon-github {
+    @include mask-icon(url("#{$base-url}/img/icon-github.svg"));
+}
+
+.icon-linkedin {
+    @include mask-icon(url("#{$base-url}/img/icon-linkedin.svg"));
+}

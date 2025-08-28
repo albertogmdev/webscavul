@@ -24,7 +24,9 @@ body {
 
 .page {
   padding-top: $navbarHeight + 48px;
+  padding-bottom: 40px;
   width: 100%;
+  min-height: calc(100dvh - #{$footerHeight});
 }
 
 .ptext {

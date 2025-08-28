@@ -11,7 +11,7 @@ export default function Header() {
 					Escaner
 				</Link>
 				<Link href="/reports" className="header-link">
-					Mis reportes
+					Mis informes
 				</Link>
 			</div>
 		</nav>
