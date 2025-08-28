@@ -59,34 +59,34 @@ export default function ScannerCard() {
 					<div className="loading-text ptext">Escaneando dominio...</div>
 				</div>
 			)}
-			<InputDomain 
-				onSubmitScan={handleScan} 
-				onChangeInput={() => {setError(null)}}
+			<InputDomain
+				onSubmitScan={handleScan}
+				onChangeInput={() => { setError(null) }}
 			/>
-			{error && 
+			{error &&
 				<p className="error-message">{error}</p>
 			}
 			<div className="scanner-type">
 				<p className="type-title">Tipo de escaneo</p>
 				<div className="type-options">
 					<div className="type-option">
-						<div className="type-option">
-							<input 
-								type="radio" 
-								id="full"
-								name="scan-type" 
-								value="full" 
-								defaultChecked 
-								onChange={(e) => {setScanType(e.target.value)}}
-							/>
-							<label htmlFor="full" className="stext">Completo</label>
-						</div>
-						<input 
-							type="radio" 
-							id="headers" 
-							name="scan-type" 
-							value="headers" 
-							onChange={(e) => {setScanType(e.target.value)}}
+						<input
+							type="radio"
+							id="full"
+							name="scan-type"
+							value="full"
+							defaultChecked
+							onChange={(e) => { setScanType(e.target.value) }}
+						/>
+						<label htmlFor="full" className="stext">Completo</label>
+					</div>
+					<div className="type-option">
+						<input
+							type="radio"
+							id="headers"
+							name="scan-type"
+							value="headers"
+							onChange={(e) => { setScanType(e.target.value) }}
 						/>
 						<label htmlFor="headers" className="stext">Cabeceras</label>
 					</div>
