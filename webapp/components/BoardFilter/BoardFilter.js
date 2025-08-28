@@ -1,8 +1,4 @@
-
-
 export default function BoardFilter({onFilter}) {
-    
-
     return (
         <div className="card board-filter">
             <div className="filter-content">

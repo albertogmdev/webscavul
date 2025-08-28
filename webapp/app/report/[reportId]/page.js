@@ -79,6 +79,7 @@ export default function ReportDetail() {
 		}
 
 		getReportDetail()
+		document.title = "Informe | WebScavul"
 	}, [reportId])
 
 	return (

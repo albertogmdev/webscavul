@@ -31,6 +31,7 @@ export default function Reports() {
 		}
 
 		getAllReportsData()
+		document.title = "Listado de informes | WebScavul"
 	}, [])
 
 	const handleReportDelete = async (reportId) => {

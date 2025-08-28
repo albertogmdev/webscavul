@@ -53,6 +53,7 @@ export default function ReportBoard() {
 		}
 
 		getBoardInfo()
+		document.title = "Tablero | WebScavul"
 	}, [reportId])
 
 
