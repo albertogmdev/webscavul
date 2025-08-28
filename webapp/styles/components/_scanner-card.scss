@@ -11,7 +11,22 @@
     border-radius: $radius;
     padding: 40px 24px;
     overflow: hidden;
+    transition: border-color 0.3s ease;
     z-index: 1;
+
+    &.scanner-error {
+        border-color: $criticalText;
+
+        .error-message {
+            color: $criticalText;
+            border: 1px solid $criticalBorder;
+            background-color: $criticalBg;
+            padding: 10px;
+            border-radius: $radius;
+            margin-top: 10px;
+            text-align: center;
+        }
+    }
 
     .scanner-type {
         margin-top: 40px;
@@ -34,8 +49,6 @@
             }
         }
     }
-
-    .scanner-others {}
 
     .loading-layout {
         position: absolute;

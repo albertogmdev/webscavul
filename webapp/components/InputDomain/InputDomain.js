@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-export default function InputDomain({onSubmitScan}) {
+export default function InputDomain({onSubmitScan, onChangeInput}) {
 	const [domain, setDomain] = useState('')
 
 	const handleSubmit = (event) => {
@@ -11,7 +11,10 @@ export default function InputDomain({onSubmitScan}) {
         if (onSubmitScan) onSubmitScan(domain)
     }
 
-    const handleChange = (event) => { setDomain(event.target.value) }
+    const handleChange = (event) => { 
+		if (onChangeInput) onChangeInput()
+		setDomain(event.target.value) 
+	}
 
 	return (<>
 		<p className="input-label" htmlFor="domain">Introduce la URL de la web</p>
