@@ -1,6 +1,6 @@
 export default function BoardFilter({onFilter}) {
     return (
-        <div className="card board-filter">
+        <div className="card section-filter">
             <div className="filter-content">
                 <div className="filter-item">
                     <p className="item-label">Tipo</p>

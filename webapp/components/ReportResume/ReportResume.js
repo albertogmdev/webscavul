@@ -109,7 +109,11 @@ export default function ReportResume({ report, onDeleteReport }) {
                 )}
                 <div className="resume-item">
                     <h4 className="item-title">Fecha</h4>
-                    <p className="item-text">{report.created_at.split("T")[0].split("-").reverse().join("/")}</p>
+                    <p className="item-text">
+                        { report.created_at.split("T")[0].split("-").reverse().join("/") }
+                        &nbsp;
+                        { report.created_at.split("T")[1].split(".")[0].split(":").slice(0,2).join(":") }
+                    </p>
                 </div>
             </div>
             <div className="resume-buttons">
