@@ -13,6 +13,9 @@ export default function Header() {
 				<Link href="/reports" className="header-link">
 					Mis informes
 				</Link>
+				<button className="theme-button">
+					<span className="icon icon-light"></span>
+				</button>
 			</div>
 		</nav>
 	)

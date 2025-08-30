@@ -75,3 +75,11 @@
 .icon-linkedin {
     @include mask-icon(url("#{$base-url}/img/icon-linkedin.svg"));
 }
+
+.icon-dark {
+    @include mask-icon(url("#{$base-url}/img/icon-dark.svg")); 
+}
+
+.icon-light {
+    @include mask-icon(url("#{$base-url}/img/icon-light.svg")); 
+}

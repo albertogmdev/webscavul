@@ -33,15 +33,30 @@
 
     .header-links {
         display: flex;
+        align-items: center;
         gap: 16px;
 
         .header-link {
-            color: $secondaryText;
+            color: $primaryText;
             text-decoration: none;
             transition: all 0.3s ease;
 
             &:hover {
                 color: $primaryAccent;
+            }
+        }
+
+        .theme-button {
+            .icon {
+                aspect-ratio: 1 / 1;
+                height: 24px;
+                width: auto;
+                background-color: $primaryText;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: $primaryAccent;
+                }
             }
         }
     }
