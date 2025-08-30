@@ -110,7 +110,7 @@ export default function Task({ task, listId, lists, onDeleteTask, onTaskMove }) 
                             </ul>
                         )}
                     </div>
-                    <div className="task-content">
+                    <div className="task-content scroll-section">
                         <div className="task-details">
                             <p className="content-title">Detalles</p>
                             <div className="content-info">

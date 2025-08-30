@@ -348,7 +348,7 @@ export default function ReportBoard() {
 							onFilter={handleFilter}
 						/>
 					</section>
-					<section className="board-lists">
+					<section className="board-lists scroll-section">
 						{filteredBoardData.map((list, index) => (
 							<BoardList
 								key={index}

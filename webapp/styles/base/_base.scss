@@ -4,7 +4,7 @@
   box-sizing: border-box;
   color: $primaryText;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  scrollbar-color: auto red;
+  transition: color .3s ease, background .3s ease;
 }
 
 html {
@@ -28,6 +28,27 @@ body {
   padding-bottom: 40px;
   width: 100%;
   min-height: calc(100dvh - #{$footerHeight});
+}
+
+.scroll-section {
+  scrollbar-gutter: stable;
+  padding-right: 4px;
+}
+
+.scroll-section::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  
+}
+
+.scroll-section::-webkit-scrollbar-track {
+  background-color: rgba($contrast, .1);
+  border-radius: 6px;
+}
+
+.scroll-section::-webkit-scrollbar-thumb {
+  background-color: rgba($contrast, .5);
+  border-radius: 6px;
 }
 
 .ptext {

@@ -1,5 +1,4 @@
 export default function ReportHeaders({ headerData }) {
-    console.log(headerData)
     return (
         <section className="report-headers">
             <div className="card">

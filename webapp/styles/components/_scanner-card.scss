@@ -12,6 +12,7 @@
     padding: 40px 24px;
     overflow: hidden;
     transition: border-color 0.3s ease;
+    box-shadow: 0px 0px 10px -2px $primaryAccent;
     z-index: 1;
 
     &.scanner-error {

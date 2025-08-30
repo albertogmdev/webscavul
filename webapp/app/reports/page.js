@@ -25,7 +25,6 @@ export default function Reports() {
 
 					setReportData(reports)
 					setFilteredReportData(reports)
-					console.log(reports)
 				}
 				else setError(`Error fetching reports: ${response.error}`)
 			} catch (err) {
