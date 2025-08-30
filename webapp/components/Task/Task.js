@@ -32,7 +32,8 @@ export default function Task({ task, listId, lists, onDeleteTask, onTaskMove }) 
             if (type === "solution" && taskSolution) return
             if (type === "context" && taskContext) return
 
-            const modelAnswer = await askModel(task.title, type)
+            const query = `Vulnerabiliad: ${task.title}, Importancia: ${task.severity}, Información proporcionada: ${task.details}, Código asociado: ${task.code || "No hay código asociado."}`
+            const modelAnswer = await askModel(query, type)
 
             if (type === "solution") seTaskSolution(modelAnswer)
             else if (type === "context") seTaskContext(modelAnswer)

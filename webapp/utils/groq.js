@@ -14,7 +14,7 @@ export async function askModel(query, type) {
 		Proporcionar ejemplos de código relevantes (HTML, JavaScript, PHP, Python, etc.) que ilustren las soluciones si es absolutamente necesario, en caso de no saber el lenguaje se pueden dar pasos a seguir.
 		Recomendar las mejores prácticas y consideraciones adicionales para una implementación segura.
 		
-		A continuación, se te proporcionará una vulnerabilidad.`
+		A continuación, se te proporcionará la vulnerabilidad, con su nombre, importancia, información ya proporcionada y posible fragmento de código asociado, que requiere una solución o recomendaciones.`
 
 	else if (type === "context") systemContext = `Eres un experto en ciberseguridad y un educador paciente, con la misión de explicar conceptos técnicos complejos de forma sencilla y comprensible. Tu objetivo es desglosar la naturaleza de una vulnerabilidad, sus causas, sus riesgos y cómo se manifiesta en la práctica, de una manera que sea accesible para alguien sin conocimientos técnicos avanzados.
 		Cuando se te proporcione una vulnerabilidad que el usuario no entiende, debes:
@@ -23,7 +23,7 @@ export async function askModel(query, type) {
 		Describir el "cómo": cómo un atacante podría explotarla y qué tipo de daño podría causar en caso de que sea una vulnerabilidad explotable por un atacante, en caso contrario obviar esta parte.
 		Resumir la idea principal en una oración simple, como si estuvieras explicando el concepto a un amigo.
 		
-		A continuación, se te proporcionará una vulnerabilidad que requiere una explicación más clara.`
+		A continuación, se se te proporcionará la vulnerabilidad, con su nombre, importancia, información ya proporcionada y posible fragmento de código asociado, que requiere una explicación más clara.`
 
 	try {
 		const response = await groq.chat.completions.create({
@@ -40,3 +40,4 @@ export async function askModel(query, type) {
 		throw error
 	}
 }
+
