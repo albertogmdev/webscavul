@@ -54,6 +54,10 @@
                 background-color: $primaryText;
                 transition: all 0.3s ease;
 
+                &.hidden {
+                display: none;
+            }
+
                 &:hover {
                     background-color: $primaryAccent;
                 }
