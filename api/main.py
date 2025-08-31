@@ -62,19 +62,12 @@ def custom_headers():
         "Set-Cookie": "sessionid=12345; Secure; HttpOnly; SameSite=Strict"
     }
 
-    content = "<!DOCTYPE html><html lang='en'><head><title>Document</title></head><body>"
+    content = ""
     
     try:
-        with open('api/test/links.html', 'r', encoding='utf-8') as file:
+        with open('api/test/full_test.html', 'r', encoding='utf-8') as file:
             content += file.read()
-        with open('api/test/script_tags.html', 'r', encoding='utf-8') as file:
-            content += file.read()
-        with open('api/test/link_tags.html', 'r', encoding='utf-8') as file:
-            content += file.read()
-        with open('api/test/metas.html', 'r', encoding='utf-8') as file:
-            content += file.read()
-        with open('api/test/forms.html', 'r', encoding='utf-8') as file:
-            content += file.read()
+            
     except FileNotFoundError:
         print("Error: El archivo no fue encontrado en la ruta especificada.")
         content = "<h1>Archivo no encontrado</h1>"
