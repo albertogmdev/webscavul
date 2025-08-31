@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM --platform=linux/amd64 node:22-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -47,4 +47,4 @@ COPY --from=builder --chown=nextjs:nodejs /webscavul/webapp/.next/static ./.next
 
 USER nextjs
 
-CMD npm run dev
+CMD ["node", "server.js"]
