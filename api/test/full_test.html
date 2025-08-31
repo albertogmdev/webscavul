@@ -5,53 +5,53 @@
     <!-- CORRECTO: charset utf-8 configurado -->
     <meta charset="utf-8">
 
-    <!-- DEBE DETECTAR: Meta tag generator encontrada (Information) -->
+    <!-- DEBE DETECTAR: Meta tag generator encontrada -->
     <meta name="generator" content="WordPress 6.0">
 
-    <!-- DEBE DETECTAR: Meta tag referrer con valor no recomendado (Medium) -->
+    <!-- DEBE DETECTAR: Meta tag referrer con valor no recomendado -->
     <meta name="referrer" content="unsafe-url">
 
     <!-- CORRECTO: Meta robots configurada -->
     <meta name="robots" content="index, follow">
 
-    <!-- DEBE DETECTAR: Meta tag CSP no configurada (High) - si no hay header CSP -->
+    <!-- DEBE DETECTAR: Meta tag CSP no configurada - si no hay header CSP -->
     <!-- Si hay CSP por header, esto no debería detectarse -->
 
-    <!-- DEBE DETECTAR: Meta tag refresh con redirección insegura (High) -->
-    <meta http-equiv="refresh" content="5;url=http://malicious-site.com">
+    <!-- DEBE DETECTAR: Meta tag refresh con redirección insegura -->
+    <meta http-equiv="refresh" content="300;url=http://test-site.com">
 
     <!-- CORRECTO: Link con HTTPS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 
-    <!-- DEBE DETECTAR: Link externo inseguro HTTP (Low) -->
+    <!-- DEBE DETECTAR: Link externo inseguro HTTP -->
     <link rel="stylesheet" href="http://insecure-cdn.com/style.css">
 
-    <!-- DEBE DETECTAR: Link sin crossorigin ni integrity (Low) -->
+    <!-- DEBE DETECTAR: Link sin crossorigin ni integrity -->
     <link rel="stylesheet" href="https://external-cdn.com/style.css">
 
-    <!-- DEBE DETECTAR: Link con crossorigin sin integrity (Low) -->
+    <!-- DEBE DETECTAR: Link con crossorigin sin integrity -->
     <link rel="stylesheet" href="https://external-cdn.com/style2.css" crossorigin="anonymous">
 
-    <!-- DEBE DETECTAR: Link con integrity sin crossorigin (Low) -->
+    <!-- DEBE DETECTAR: Link con integrity sin crossorigin -->
     <link rel="stylesheet" href="https://external-cdn.com/style3.css" integrity="sha384-example">
 
     <!-- CORRECTO: Link con crossorigin e integrity configurados -->
     <link rel="stylesheet" href="https://external-cdn.com/style4.css" crossorigin="anonymous"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3">
 
-    <!-- DEBE DETECTAR: Link con atributos deprecados (Medium) -->
+    <!-- DEBE DETECTAR: Link con atributos deprecados -->
     <link rel="stylesheet" href="style.css" charset="utf-8" rev="stylesheet">
 
-    <!-- DEBE DETECTAR: Script externo inseguro HTTP (Low) -->
+    <!-- DEBE DETECTAR: Script externo inseguro HTTP -->
     <script src="http://insecure-cdn.com/script.js"></script>
 
-    <!-- DEBE DETECTAR: Script sin crossorigin ni integrity (Medium) -->
+    <!-- DEBE DETECTAR: Script sin crossorigin ni integrity -->
     <script src="https://external-cdn.com/script.js"></script>
 
-    <!-- DEBE DETECTAR: Script con crossorigin sin integrity (Medium) -->
+    <!-- DEBE DETECTAR: Script con crossorigin sin integrity -->
     <script src="https://external-cdn.com/script2.js" crossorigin="anonymous"></script>
 
-    <!-- DEBE DETECTAR: Script con integrity sin crossorigin (Medium) -->
+    <!-- DEBE DETECTAR: Script con integrity sin crossorigin -->
     <script src="https://external-cdn.com/script3.js" integrity="sha384-example"></script>
 
     <!-- CORRECTO: Script con crossorigin e integrity configurados -->
@@ -67,19 +67,15 @@
 <body>
     <h1>Página de Prueba para Detección de Vulnerabilidades</h1>
 
-    <h2>Vulnerabilidades en Meta Tags</h2>
-    <p>Casos de prueba para meta tags ya incluidos en el head del documento:</p>
-    <ul>
-        <li>Meta charset correcto (utf-8) - NO debe detectar</li>
-        <li>Meta generator presente - DEBE detectar (Information)</li>
-        <li>Meta referrer con valor no recomendado - DEBE detectar (Medium)</li>
-        <li>Meta robots configurado - NO debe detectar</li>
-        <li>Meta refresh con URL HTTP - DEBE detectar (High)</li>
-    </ul>
+    <h2>Vulnerabilidades en Scripts</h2>
+    <p>Ya incluidos en el head de la página</p>
+
+    <h2>Vulnerabilidades en Scripts</h2>
+    <p>Ya incluidos en el head de la página</p>
 
     <h2>Vulnerabilidades en Formularios</h2>
 
-    <!-- DEBE DETECTAR: Formulario sin token CSRF (High) -->
+    <!-- DEBE DETECTAR: Formulario sin token CSRF -->
     <form id="form-vulnerable-1" action="process.php" method="post">
         <label for="username">Usuario:</label>
         <input type="text" id="username" name="username">
@@ -88,15 +84,15 @@
         <button type="submit">Enviar</button>
     </form>
 
-    <!-- DEBE DETECTAR: Formulario con action HTTP externo (High) -->
-    <form id="form-vulnerable-2" action="http://malicious-site.com/process" method="post">
+    <!-- DEBE DETECTAR: Formulario con action HTTP externo -->
+    <form id="form-vulnerable-2" action="http://test-site.com/process" method="post">
         <input type="hidden" name="csrf_token" value="abc123">
         <label for="data">Datos:</label>
         <input type="text" id="data" name="data">
         <button type="submit">Enviar</button>
     </form>
 
-    <!-- DEBE DETECTAR: Formulario con datos confidenciales en GET (High) -->
+    <!-- DEBE DETECTAR: Formulario con datos confidenciales en GET -->
     <form id="form-vulnerable-3" action="login.php" method="get">
         <input type="hidden" name="csrf_token" value="abc123">
         <label for="user">Usuario:</label>
@@ -106,7 +102,7 @@
         <button type="submit">Login</button>
     </form>
 
-    <!-- DEBE DETECTAR: Formulario sin action (Information) -->
+    <!-- DEBE DETECTAR: Formulario sin action -->
     <form id="form-vulnerable-4" method="post">
         <input type="hidden" name="csrf_token" value="abc123">
         <label for="comment">Comentario:</label>
@@ -114,7 +110,7 @@
         <button type="submit">Comentar</button>
     </form>
 
-    <!-- DEBE DETECTAR: Campo password con tipo text (Medium) -->
+    <!-- DEBE DETECTAR: Campo password con tipo text -->
     <form id="form-vulnerable-5" action="change-password.php" method="post">
         <input type="hidden" name="csrf_token" value="abc123">
         <label for="old-pwd">Contraseña actual:</label>
@@ -124,7 +120,7 @@
         <button type="submit">Cambiar</button>
     </form>
 
-    <!-- DEBE DETECTAR: Campo password en textarea (Medium) -->
+    <!-- DEBE DETECTAR: Campo password en textarea -->
     <form id="form-vulnerable-6" action="process.php" method="post">
         <input type="hidden" name="csrf_token" value="abc123">
         <label for="pwd-area">Contraseña:</label>
@@ -132,7 +128,7 @@
         <button type="submit">Enviar</button>
     </form>
 
-    <!-- DEBE DETECTAR: Formulario login sin CSRF (Information) -->
+    <!-- DEBE DETECTAR: Formulario login sin CSRF -->
     <form id="form-login-vulnerable" action="login.php" method="post">
         <label for="login-user">Usuario:</label>
         <input type="text" id="login-user" name="username">
@@ -157,21 +153,18 @@
         <button type="submit">Enviar</button>
     </form>
 
-    <h2>Vulnerabilidades en Scripts</h2>
-    <p>Ya incluidos en el head de la página</p>
-
     <h2>Vulnerabilidades en Enlaces</h2>
 
-    <!-- DEBE DETECTAR: Enlace externo inseguro HTTP (Low) -->
+    <!-- DEBE DETECTAR: Enlace externo inseguro HTTP -->
     <a href="http://insecure-site.com" id="link-vulnerable-1">Sitio Inseguro</a>
 
-    <!-- DEBE DETECTAR: Enlace con target _blank sin rel (Medium) -->
+    <!-- DEBE DETECTAR: Enlace con target _blank sin rel -->
     <a href="https://external-site.com" target="_blank" id="link-vulnerable-2">Abrir en nueva ventana sin protección</a>
 
-    <!-- DEBE DETECTAR: Enlace con target _blank sin noopener (Medium) -->
+    <!-- DEBE DETECTAR: Enlace con target _blank sin noopener -->
     <a href="https://external-site.com" target="_blank" rel="noreferrer" id="link-vulnerable-3">Solo noreferrer</a>
 
-    <!-- DEBE DETECTAR: Enlace con target _blank sin noreferrer (Medium) -->
+    <!-- DEBE DETECTAR: Enlace con target _blank sin noreferrer -->
     <a href="https://external-site.com" target="_blank" rel="noopener" id="link-vulnerable-4">Solo noopener</a>
 
     <!-- CORRECTO: Enlace interno -->
@@ -213,4 +206,5 @@
         <a href="tel:+1234567890">Phone Link</a> <!-- NO debe detectar -->
     </div>
 </body>
+
 </html>
