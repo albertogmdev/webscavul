@@ -54,6 +54,10 @@ class WebPage:
             page = await browser.new_page()
             await page.goto(url)
             await page.wait_for_load_state("load")
+            
+            # Ngrok visite site button
+            await page.click('text="Visit Site"')  
+            await page.wait_for_timeout(500)
 
             self.content = await page.content()
 
@@ -87,15 +91,19 @@ class Form:
             else: self.fields_count[field.type] = self.fields_count[field.type] + 1
             self.fields_count["total"] = self.fields_count["total"] + 1
         # Check if input is related to captcha or csrf
-        if field.id and 'csrf' in field.id or field.classname and 'csrf' in ''.join(field.classname).lower() or field.name and 'csrf' in field.name.lower():
+        if 'csrf' in field.format_field_info():
             self.has_csrf = True
-        if field.id and 'captcha' in field.id or field.classname and 'captcha' in ''.join(field.classname).lower() or field.name and 'captcha' in field.name.lower():
+        print(field.format_field_info())
+        if 'captcha' in field.format_field_info():
             self.has_captcha = True
 
         self.fields.append(field)
 
     def set_form_type(self, type: str):
         self.form_type = type
+        
+    def set_captcha(self, isSet: bool):
+        self.has_captcha = type
     
     def format_form_info(self) -> str:
         form_id = ""

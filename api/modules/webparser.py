@@ -39,10 +39,15 @@ def parse_forms(soup: BeautifulSoup, webpage: WebPage):
         if form_method:
             form_method = form_method.upper()
         form_action = form.get('action')
-
         formObject = Form(form_id, form_class, form_action, form_method, str(form))
         parse_fields(form, formObject)
         form_type = determine_formtype(formObject, form, webpage.url)
+    
+        for div in form.find_all('div'):
+            div_class = div.get('class') or [] 
+            if 'captcha' in ' '.join(div_class).lower(): 
+                formObject.set_captcha(True)
+                break
 
         if form_type: 
             formObject.set_form_type(form_type)
@@ -58,7 +63,8 @@ def parse_fields(form: BeautifulSoup, formObject: Form):
         field_class = field.get('class')
         field_name = field.get('name')
         field_type = field.get('type', 'text')
-        if field.name == 'select' or field.name == 'textarea': field_type = field.name
+        if field.name == 'select' or field.name == 'textarea': 
+            field_type = field.name
         field_value = field.get('value', '')
         field_placeholder = field.get('placeholder', '')
 
@@ -100,8 +106,8 @@ def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
         script_external = script_src and webpage.domain not in script_src and not script_src.startswith('/')
 
         #print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
-        webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, str(script)))
-        
+        webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, str(script)))    
+
 def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
     form_type = None
     total_count = form.fields_count["total"]

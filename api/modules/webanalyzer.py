@@ -181,29 +181,33 @@ def analyze_metatags(webpage: WebPage, headers: dict):
 
     # Refresh meta tag / header
     meta_refresh = None
+    meta_code = None
     is_header = False
     if not headers['refresh']['enabled']: 
         meta_refresh = webpage.get_meta_by_http("Refresh")
-        if meta_refresh: meta_refresh = meta_refresh.content
+        if meta_refresh:
+            meta_code = meta_refresh.code 
+            meta_refresh = meta_refresh.content
     else: 
         is_header = True
         meta_refresh = headers['refresh']['value']
-    if meta_refresh:
-        values = re.split('; |, ', meta_refresh.lower())
+    if meta_refresh is not None:
+        values = re.split(';|,', meta_refresh.lower())
         for value in values:
+            value = value.strip()
             if value.startswith('url='):
                 split_value = value.split('=')
                 url = None
                 if len(split_value) > 1:
                     url = split_value[1]
-                if url and url.startswith(('http://')):
+                if url and url.startswith(('http')):
                     webpage.add_vulnerability(Vulnerability(
-                        name=f"{'Meta tag' if is_header else 'Header'} refresh con valor de redirección inseguro (HTTP)",
-                        type=f"{'Meta' if is_header else 'Header'}",
+                        name=f"{'Meta tag' if not is_header else 'Header'} refresh con valor de redirección inseguro (HTTP)",
+                        type=f"{'Meta' if not is_header else 'Header'}",
                         severity="High",
                         location=url,
-                        code=meta_refresh,
-                        details="La cabecera 'Refresh' redirige a un recurso o sitio externo inseguro o malicioso utilizando HTTP en lugar de HTTPS. Esto puede permitir ataques de phishing a dominios inseguros. Si el recurso no es conocido, se recomienda utilizar HTTPS para todos los recursos externos de la página web.",
+                        code=meta_refresh if is_header else meta_code,
+                        details=f"La {'Meta tag' if not is_header else 'cabecera'} 'Refresh' redirige a un recurso o sitio externo inseguro o malicioso utilizando HTTP en lugar de HTTPS. Esto puede permitir ataques de phishing a dominios inseguros. Si el recurso no es conocido, se recomienda utilizar HTTPS para todos los recursos externos de la página web.",
                     ))
                 elif url:
                     webpage.add_vulnerability(Vulnerability(
@@ -212,7 +216,7 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                         severity="Information",
                         location=url,
                         code=meta_refresh,
-                        details="La cabecera o meta tag Refresh está activa. Aunque no siempre es peligrosa, puede ser usada para redirigir de forma automática a páginas maliciosas. Se recomienda evitar su uso y, en su lugar, gestionar las redirecciones desde el servidor de manera controlada.",
+                        details=f"La {'Meta tag' if not is_header else 'cabecera'} está activa. Aunque no siempre es peligrosa, puede ser usada para redirigir de forma automática a páginas maliciosas. Se recomienda evitar su uso y, en su lugar, gestionar las redirecciones desde el servidor de manera controlada.",
                     ))
     
     # Charset meta tag
