@@ -90,10 +90,9 @@ def parse_linktags(soup: BeautifulSoup, webpage: WebPage):
         link_type = link.get('type')
         link_integrity = link.get('integrity')
         link_crossorigin = link.get('crossorigin')
-        link_external = link_href and webpage.domain not in link_href and not link_href.startswith('/')
 
         #print('[LINKTAG]', link_href, link_rel, link_type, link_integrity, link_crossorigin, link_external)
-        webpage.add_link_tag(LinkTag(link_href, link_rel, link_type, link_external, link_integrity, link_crossorigin, str(link)))
+        webpage.add_link_tag(LinkTag(link_href, link_rel, link_type, link_integrity, link_crossorigin, str(link)))
 
 def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
     print("INFO: Parsing scripts in the webpage")
@@ -103,10 +102,9 @@ def parse_scripttags(soup: BeautifulSoup, webpage: WebPage):
         script_crossorigin = script.get('crossorigin')
         script_integrity = script.get('integrity')
         script_content = script.string
-        script_external = script_src and webpage.domain not in script_src and not script_src.startswith('/')
 
         #print('[SCRIPT]', script_src, script_type, script_crossorigin, script_integrity, script_external)
-        webpage.add_script_tag(ScriptTag(script_src, script_type, script_external, script_crossorigin, script_integrity, script_content, str(script)))    
+        webpage.add_script_tag(ScriptTag(script_src, script_type, script_crossorigin, script_integrity, script_content, str(script)))    
 
 def determine_formtype(form: Form, form_element: BeautifulSoup, url: str):
     form_type = None

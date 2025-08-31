@@ -85,16 +85,16 @@ class Form:
         self.code = code
 
     def add_field(self, field):
+        field_info = field.format_field_info()
         # Count fields types in a form
         if field.type != 'hidden':
             if field.type not in self.fields_count: self.fields_count[field.type] = 1
             else: self.fields_count[field.type] = self.fields_count[field.type] + 1
             self.fields_count["total"] = self.fields_count["total"] + 1
         # Check if input is related to captcha or csrf
-        if 'csrf' in field.format_field_info():
+        if 'csrf' in field_info:
             self.has_csrf = True
-        print(field.format_field_info())
-        if 'captcha' in field.format_field_info():
+        if 'captcha' in field_info:
             self.has_captcha = True
 
         self.fields.append(field)
@@ -159,25 +159,31 @@ class Link:
         return href and href.startswith(("http://", "https://", "//"))
     
 class ScriptTag:
-    def __init__(self, src: str, type: str, external: bool, crossorigin: str, integrity: str, content: str, code: str):
+    def __init__(self, src: str, type: str, crossorigin: str, integrity: str, content: str, code: str):
         self.src = src
         self.inline = src is None or src == ""
         self.type = type
-        self.external = external
+        self.external = self.is_external(src)
         self.crossorigin = crossorigin
         self.integrity = integrity
         self.content = content
         self.code = code
 
+    def is_external(self, src: str) -> bool:
+        return src and src.startswith(("http://", "https://", "//"))
+
 class LinkTag:
-    def __init__(self, href: str, rel: str, type: str, external: bool, integrity: str, crossorigin: str, code: str):
+    def __init__(self, href: str, rel: str, type: str, integrity: str, crossorigin: str, code: str):
         self.href = href
         self.rel = rel
         self.type = type
-        self.external = external
+        self.external = self.is_external(href)
         self.integrity = integrity
         self.crossorigin = crossorigin
         self.code = code
+
+    def is_external(self, href: str) -> bool:
+        return href and href.startswith(("http://", "https://", "//"))
     
 class Vulnerability:
     def __init__(self, name: str, type: str, severity: str, details: str, location: str = "", code: str = ""):

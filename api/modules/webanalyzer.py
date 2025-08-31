@@ -17,7 +17,7 @@ def analyze_forms(webpage: WebPage):
         # CSRF Token not present
         if not form.has_csrf and not form.has_captcha:
             form_type = form.form_type
-            severity = 'High' if form_type not in ["login", "signup"] else 'Information'
+            severity = 'High' if form_type in ["login", "signup"] else 'Information'
             webpage.add_vulnerability(Vulnerability(
                 name=f"Formulario sin token CSRF implementado",
                 type="Form",
@@ -30,7 +30,7 @@ def analyze_forms(webpage: WebPage):
         # Action with HTTP url
         if form.action and form.action.startswith('http://'):
             webpage.add_vulnerability(Vulnerability(
-                name="Form con atributo 'action' externo inseguro (HTTP)",
+                name="Formulario con atributo 'action' externo inseguro (HTTP)",
                 type="Form",
                 severity="High",
                 location=f"{form.id} action: [${form.action}]",
@@ -76,7 +76,7 @@ def analyze_forms(webpage: WebPage):
                     ))
                     if not form.method or form.method.lower() == 'get' or form.method == '':
                         webpage.add_vulnerability(Vulnerability(
-                            name="Form con datos confidenciales expuestos (GET)",
+                            name="Formulario con datos confidenciales expuestos (GET)",
                             type="Form",
                             severity="High",
                             location=form.id,
@@ -216,7 +216,7 @@ def analyze_metatags(webpage: WebPage, headers: dict):
                         severity="Information",
                         location=url,
                         code=meta_refresh,
-                        details=f"La {'Meta tag' if not is_header else 'cabecera'} está activa. Aunque no siempre es peligrosa, puede ser usada para redirigir de forma automática a páginas maliciosas. Se recomienda evitar su uso y, en su lugar, gestionar las redirecciones desde el servidor de manera controlada.",
+                        details=f"La {'metatag' if not is_header else 'cabecera'} está activa. Aunque no siempre es peligrosa, puede ser usada para redirigir de forma automática a páginas maliciosas. Se recomienda evitar su uso y, en su lugar, gestionar las redirecciones desde el servidor de manera controlada.",
                     ))
     
     # Charset meta tag
@@ -255,13 +255,17 @@ def analyze_metatags(webpage: WebPage, headers: dict):
         ))
    
     meta_referrer = None
+    meta_code = None
     is_header = False
-    if not headers['referrer']['enabled'] or headers['referrer']['enabled'] and not headers['referrer']['correct']: 
+    if not headers['referrer']['enabled']: 
         meta_referrer = webpage.get_meta_by_name("referrer")
-        if meta_referrer: meta_referrer = meta_referrer.content
+        if meta_referrer: 
+            meta_code = meta_referrer.code
+            meta_referrer = meta_referrer.content
     else:
         meta_referrer = headers['referrer']['value']
         is_header = True
+    print(meta_referrer, meta_code, is_header)
     
     if not meta_referrer:
         webpage.add_vulnerability(Vulnerability(
@@ -273,10 +277,12 @@ def analyze_metatags(webpage: WebPage, headers: dict):
         ))
     elif meta_referrer and meta_referrer.lower() not in ['no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade', 'strict-origin']:
         webpage.add_vulnerability(Vulnerability(
-            name=f"{'Meta tag' if is_header else 'Header'} referrer con valor no recomendado",
-            type=f"{'Meta' if is_header else 'Header'}",
+            name=f"{'Meta tag' if not is_header else 'Header'} referrer con valor no recomendado",
+            type=f"{'Meta' if not is_header else 'Header'}",
             severity="Medium",
-            details="La cabecera o meta tag referrer utiliza un valor no recomendado. Esto puede permitir la filtración innecesaria de datos a otros sitios. Se recomienda utilizar valores seguros como 'no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade' o 'strict-origin'.",
+            location=meta_referrer,
+            code=meta_referrer if is_header else meta_code,
+            details=f"La {'metatag' if not is_header else 'cabecera'} referrer utiliza un valor no recomendado. Esto puede permitir la filtración innecesaria de datos a otros sitios. Se recomienda utilizar valores seguros como 'no-referrer', 'strict-origin-when-cross-origin', 'no-referrer-when-downgrade' o 'strict-origin'.",
         ))
 
     # generator meta tag
